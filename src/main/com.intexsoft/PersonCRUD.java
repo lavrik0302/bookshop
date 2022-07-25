@@ -59,7 +59,7 @@ public class PersonCRUD {
         Statement statement;
         ResultSet rs = null;
         try {
-            String query = String.format("select * from person where name= '%s'", surname);
+            String query = String.format("select * from person where surname= '%s'", surname);
             statement = connection.createStatement();
             rs = statement.executeQuery(query);
             while (rs.next()) {
@@ -73,11 +73,11 @@ public class PersonCRUD {
         }
     }
 
-    public void search_by_id(Connection connection, int id) {
+    public void search_by_id(Connection connection, UUID person_id) {
         Statement statement;
         ResultSet rs = null;
         try {
-            String query = String.format("select * from person where personid= '%s'", id);
+            String query = String.format("select * from person where person_id= '%s'", person_id);
             statement = connection.createStatement();
             rs = statement.executeQuery(query);
             while (rs.next()) {
@@ -109,10 +109,10 @@ public class PersonCRUD {
         }
     }
 
-    public void update_name(Connection connection, String old_name, String new_name) {
+    public void update_name_by_name(Connection connection, String name, String new_name) {
         Statement statement;
         try {
-            String query = String.format("update person set name='%s' where name='%s'", new_name, old_name);
+            String query = String.format("update person set name='%s' where name='%s'", new_name, name);
             statement = connection.createStatement();
             statement.executeUpdate(query);
             System.out.println("data updated");
@@ -121,7 +121,44 @@ public class PersonCRUD {
         }
     }
 
-    public void update_surname(Connection connection, String old_surname, String new_surname) {
+    public void update_name_by_surname(Connection connection, String surname, String new_name) {
+        Statement statement;
+        try {
+            String query = String.format("update person set name='%s' where surname='%s'", new_name, surname);
+            statement = connection.createStatement();
+            statement.executeUpdate(query);
+            System.out.println("data updated");
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    public void update_name_by_mobileNumber(Connection connection, String mobileNumber, String new_name) {
+        Statement statement;
+        try {
+
+            String query = String.format("update person set name='%s' where mobilenumber='%s'", new_name, mobileNumber);
+            statement = connection.createStatement();
+            statement.executeUpdate(query);
+            System.out.println("data updated");
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    public void update_name_by_person_id(Connection connection, UUID person_id, String new_name) {
+        Statement statement;
+        try {
+            String query = String.format("update person set name='%s' where person_id='%s'", new_name, person_id);
+            statement = connection.createStatement();
+            statement.executeUpdate(query);
+            System.out.println("data updated");
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    public void update_surname_by_surname(Connection connection, String old_surname, String new_surname) {
         Statement statement;
         try {
             String query = String.format("update person set surname='%s' where surname='%s'", new_surname, old_surname);
@@ -133,7 +170,44 @@ public class PersonCRUD {
         }
     }
 
-    public void update_mobileNumber(Connection connection, String old_mobileNumber, String new_mobileNumber) {
+    public void update_surname_by_name(Connection connection, String name, String new_surname) {
+        Statement statement;
+        try {
+            String query = String.format("update person set surname='%s' where name='%s'", new_surname, name);
+            statement = connection.createStatement();
+            statement.executeUpdate(query);
+            System.out.println("data updated");
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    public void update_surname_by_mobileNumber(Connection connection, String mobileNumber, String new_surname) {
+        Statement statement;
+        try {
+            String query = String.format("update person set surname='%s' where mobilenumber='%s'", new_surname, mobileNumber);
+            statement = connection.createStatement();
+            statement.executeUpdate(query);
+            System.out.println("data updated");
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    public void update_surname_by_person_id(Connection connection, UUID person_id, String new_surname) {
+
+        Statement statement;
+        try {
+            String query = String.format("update person set surname='%s' where person_id='%s'", new_surname, person_id);
+            statement = connection.createStatement();
+            statement.executeUpdate(query);
+            System.out.println("data updated");
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    public void update_mobileNumber_by_mobileNumber(Connection connection, String old_mobileNumber, String new_mobileNumber) {
         Statement statement;
         try {
             String query = String.format("update person set mobilenumber='%s' where mobilenumber='%s'", new_mobileNumber, old_mobileNumber);
@@ -144,6 +218,54 @@ public class PersonCRUD {
             System.out.println(e);
         }
     }
+
+    public void update_mobileNumber_by_name(Connection connection, String name, String new_mobileNumber) {
+        Statement statement;
+        try {
+            String query = String.format("update person set mobilenumber='%s' where name='%s'", new_mobileNumber, name);
+            statement = connection.createStatement();
+            statement.executeUpdate(query);
+            System.out.println("data updated");
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    public void update_mobileNumber_by_surname(Connection connection, String surname, String new_mobileNumber) {
+        Statement statement;
+        try {
+            String query = String.format("update person set mobilenumber='%s' where surname='%s'", new_mobileNumber, surname);
+            statement = connection.createStatement();
+            statement.executeUpdate(query);
+            System.out.println("data updated");
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    public void update_mobileNumber_by_person_id(Connection connection, UUID person_id, String new_mobileNumber) {
+        Statement statement;
+        try {
+            String query = String.format("update person set mobilenumber='%s' where person_id='%s'", new_mobileNumber, person_id);
+            statement = connection.createStatement();
+            statement.executeUpdate(query);
+            System.out.println("data updated");
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+    public void update_person_id_by_person_id(Connection connection, UUID old_person_uuid, UUID new_person_id) {
+        Statement statement;
+        try {
+            String query = String.format("update person set person_id='%s' where person_id='%s'", new_person_id, old_person_uuid);
+            statement = connection.createStatement();
+            statement.executeUpdate(query);
+            System.out.println("data updated");
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
 
     public void delete_row_by_name(Connection connection, String name) {
         Statement statement;
@@ -157,10 +279,10 @@ public class PersonCRUD {
         }
     }
 
-    public void delete_row_by_id(Connection connection, UUID id) {
+    public void delete_row_by_id(Connection connection, UUID person_id) {
         Statement statement;
         try {
-            String query = String.format("delete from person where personid= '%s'", id);
+            String query = String.format("delete from person where person_id= '%s'", person_id);
             statement = connection.createStatement();
             statement.executeUpdate(query);
             System.out.println("Data deleted");
