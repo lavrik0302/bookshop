@@ -54,6 +54,54 @@ public class PersonCRUD {
         }
     }
 
+    public UUID select_person_id_by_name(Connection connection, String name) {
+        Statement statement;
+        UUID uuid = null;
+        ResultSet rs = null;
+        try {
+            String query = String.format("select person_id from person where name= '%s'", name);
+            statement = connection.createStatement();
+            rs = statement.executeQuery(query);
+            rs.next();
+            uuid = rs.getObject(1, UUID.class);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return uuid;
+    }
+
+    public UUID select_person_id_by_surname(Connection connection, String surname) {
+        Statement statement;
+        UUID uuid = null;
+        ResultSet rs = null;
+        try {
+            String query = String.format("select person_id from person where surname= '%s'", surname);
+            statement = connection.createStatement();
+            rs = statement.executeQuery(query);
+            rs.next();
+            uuid = rs.getObject(1, UUID.class);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return uuid;
+    }
+
+    public UUID select_person_id_by_mobileNumber(Connection connection, String mobileNumber) {
+        Statement statement;
+        UUID uuid = null;
+        ResultSet rs = null;
+        try {
+            String query = String.format("select person_id from person where mobilenumber= '%s'", mobileNumber);
+            statement = connection.createStatement();
+            rs = statement.executeQuery(query);
+            rs.next();
+            uuid = rs.getObject(1, UUID.class);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return uuid;
+    }
+
     public void search_by_name(Connection connection, String name) {
         Statement statement;
         ResultSet rs = null;
@@ -70,6 +118,54 @@ public class PersonCRUD {
         } catch (Exception e) {
             System.out.println(e);
         }
+    }
+
+    public String select_name_by_person_id(Connection connection, UUID person_id) {
+        Statement statement;
+        String name = null;
+        ResultSet rs = null;
+        try {
+            String query = String.format("select name from person where person_id= '%s'", person_id);
+            statement = connection.createStatement();
+            rs = statement.executeQuery(query);
+            rs.next();
+            name = rs.getString(1);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return name;
+    }
+
+    public String select_name_by_surname(Connection connection, String surname) {
+        Statement statement;
+        String name = null;
+        ResultSet rs = null;
+        try {
+            String query = String.format("select name from person where surname= '%s'", surname);
+            statement = connection.createStatement();
+            rs = statement.executeQuery(query);
+            rs.next();
+            name = rs.getString(1);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return name;
+    }
+
+    public String select_name_by_mobileNumber(Connection connection, String mobileNumber) {
+        Statement statement;
+        String name = null;
+        ResultSet rs = null;
+        try {
+            String query = String.format("select name from person where mobilenumber= '%s'", mobileNumber);
+            statement = connection.createStatement();
+            rs = statement.executeQuery(query);
+            rs.next();
+            name = rs.getString(1);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return name;
     }
 
     public void search_by_surname(Connection connection, String surname) {
@@ -90,6 +186,54 @@ public class PersonCRUD {
         }
     }
 
+    public String select_surname_by_person_id(Connection connection, UUID person_id) {
+        Statement statement;
+        String surname = null;
+        ResultSet rs = null;
+        try {
+            String query = String.format("select surname from person where person_id= '%s'", person_id);
+            statement = connection.createStatement();
+            rs = statement.executeQuery(query);
+            rs.next();
+            surname = rs.getString(1);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return surname;
+    }
+
+    public String select_surname_by_name(Connection connection, String name) {
+        Statement statement;
+        String surname = null;
+        ResultSet rs = null;
+        try {
+            String query = String.format("select surname from person where name= '%s'", name);
+            statement = connection.createStatement();
+            rs = statement.executeQuery(query);
+            rs.next();
+            surname = rs.getString(1);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return surname;
+    }
+
+    public String select_surname_by_mobileNumber(Connection connection, String mobileNumber) {
+        Statement statement;
+        String surname = null;
+        ResultSet rs = null;
+        try {
+            String query = String.format("select surname from person where mobilenumber= '%s'", mobileNumber);
+            statement = connection.createStatement();
+            rs = statement.executeQuery(query);
+            rs.next();
+            surname = rs.getString(1);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return surname;
+    }
+
     public void search_by_mobileNumber(Connection connection, String mobileNumber) {
         Statement statement;
         ResultSet rs = null;
@@ -106,6 +250,54 @@ public class PersonCRUD {
         } catch (Exception e) {
             System.out.println(e);
         }
+    }
+
+    public String select_mobileNumber_by_person_id(Connection connection, UUID person_id) {
+        Statement statement;
+        String mobileNumber = null;
+        ResultSet rs = null;
+        try {
+            String query = String.format("select mobilenumber from person where person_id= '%s'", person_id);
+            statement = connection.createStatement();
+            rs = statement.executeQuery(query);
+            rs.next();
+            mobileNumber = rs.getString(1);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return mobileNumber;
+    }
+
+    public String select_mobileNumber_by_name(Connection connection, String name) {
+        Statement statement;
+        String mobileNumber = null;
+        ResultSet rs = null;
+        try {
+            String query = String.format("select mobilenumber from person where name= '%s'", name);
+            statement = connection.createStatement();
+            rs = statement.executeQuery(query);
+            rs.next();
+            mobileNumber = rs.getString(1);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return mobileNumber;
+    }
+
+    public String select_mobileNumber_by_surname(Connection connection, String surname) {
+        Statement statement;
+        String mobileNumber = null;
+        ResultSet rs = null;
+        try {
+            String query = String.format("select mobilenumber from person where surname= '%s'", surname);
+            statement = connection.createStatement();
+            rs = statement.executeQuery(query);
+            rs.next();
+            mobileNumber = rs.getString(1);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return mobileNumber;
     }
 
     public void update_person_id_by_person_id(Connection connection, UUID old_person_uuid, UUID new_person_id) {

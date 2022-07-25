@@ -53,6 +53,66 @@ public class BookCRUD {
             System.out.println(e);
         }
     }
+    public UUID select_book_id_by_bookname(Connection connection, String bookname) {
+        Statement statement;
+        UUID uuid = null;
+        ResultSet rs = null;
+        try {
+            String query = String.format("select book_id from book where bookname= '%s'", bookname);
+            statement = connection.createStatement();
+            rs = statement.executeQuery(query);
+            rs.next();
+            uuid = rs.getObject(1, UUID.class);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return uuid;
+    }
+    public UUID select_book_id_by_author(Connection connection, String author) {
+        Statement statement;
+        UUID uuid = null;
+        ResultSet rs = null;
+        try {
+            String query = String.format("select book_id from book where author= '%s'", author);
+            statement = connection.createStatement();
+            rs = statement.executeQuery(query);
+            rs.next();
+            uuid = rs.getObject(1, UUID.class);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return uuid;
+    }
+    public UUID select_book_id_by_cost_in_byn(Connection connection, int cost_in_byn) {
+        Statement statement;
+        UUID uuid = null;
+        ResultSet rs = null;
+        try {
+            String query = String.format("select book_id from book where cost_in_byn= '%s'", cost_in_byn);
+            statement = connection.createStatement();
+            rs = statement.executeQuery(query);
+            rs.next();
+            uuid = rs.getObject(1, UUID.class);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return uuid;
+    }
+    public UUID select_book_id_by_count_in_stock(Connection connection, int count_in_stock) {
+        Statement statement;
+        UUID uuid = null;
+        ResultSet rs = null;
+        try {
+            String query = String.format("select book_id from book where count_in_stock= '%s'", count_in_stock);
+            statement = connection.createStatement();
+            rs = statement.executeQuery(query);
+            rs.next();
+            uuid = rs.getObject(1, UUID.class);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return uuid;
+    }
 
     public void search_by_bookname(Connection connection, String bookname) {
         Statement statement;
@@ -70,6 +130,66 @@ public class BookCRUD {
         } catch (Exception e) {
             System.out.println(e);
         }
+    }
+    public String select_bookname_by_book_id(Connection connection, UUID book_id) {
+        Statement statement;
+       String bookname = null;
+        ResultSet rs = null;
+        try {
+            String query = String.format("select bookname from book where book_id= '%s'",book_id );
+            statement = connection.createStatement();
+            rs = statement.executeQuery(query);
+            rs.next();
+            bookname = rs.getString(1);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return bookname;
+    }
+    public String select_bookname_by_author(Connection connection, String author) {
+        Statement statement;
+        String bookname = null;
+        ResultSet rs = null;
+        try {
+            String query = String.format("select bookname from book where author= '%s'",author );
+            statement = connection.createStatement();
+            rs = statement.executeQuery(query);
+            rs.next();
+            bookname = rs.getString(1);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return bookname;
+    }
+    public String select_bookname_by_cost_in_byn(Connection connection, int cost_in_byn) {
+        Statement statement;
+        String bookname = null;
+        ResultSet rs = null;
+        try {
+            String query = String.format("select bookname from book where cost_in_byn= '%s'",cost_in_byn );
+            statement = connection.createStatement();
+            rs = statement.executeQuery(query);
+            rs.next();
+            bookname = rs.getString(1);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return bookname;
+    }
+    public String select_bookname_by_count_in_stock(Connection connection, int count_in_stock) {
+        Statement statement;
+        String bookname = null;
+        ResultSet rs = null;
+        try {
+            String query = String.format("select bookname from book where count_in_stock= '%s'",count_in_stock );
+            statement = connection.createStatement();
+            rs = statement.executeQuery(query);
+            rs.next();
+            bookname = rs.getString(1);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return bookname;
     }
 
     public void search_by_author(Connection connection, String author) {
@@ -89,7 +209,66 @@ public class BookCRUD {
             System.out.println(e);
         }
     }
-
+    public String select_author_by_book_id(Connection connection, UUID book_id) {
+        Statement statement;
+        String author = null;
+        ResultSet rs = null;
+        try {
+            String query = String.format("select author from book where book_id= '%s'",book_id );
+            statement = connection.createStatement();
+            rs = statement.executeQuery(query);
+            rs.next();
+            author = rs.getString(1);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return author;
+    }
+    public String select_author_by_bookname(Connection connection, String bookname) {
+        Statement statement;
+        String author = null;
+        ResultSet rs = null;
+        try {
+            String query = String.format("select author from book where bookname= '%s'",bookname );
+            statement = connection.createStatement();
+            rs = statement.executeQuery(query);
+            rs.next();
+            author= rs.getString(1);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return author;
+    }
+    public String select_author_by_cost_in_byn(Connection connection, int cost_in_byn) {
+        Statement statement;
+        String author = null;
+        ResultSet rs = null;
+        try {
+            String query = String.format("select author from book where cost_in_byn= '%s'",cost_in_byn );
+            statement = connection.createStatement();
+            rs = statement.executeQuery(query);
+            rs.next();
+            author= rs.getString(1);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return author;
+    }
+    public String select_author_by_count_in_stock(Connection connection, int count_in_stock) {
+        Statement statement;
+        String author = null;
+        ResultSet rs = null;
+        try {
+            String query = String.format("select author from book where count_in_stock= '%s'",count_in_stock );
+            statement = connection.createStatement();
+            rs = statement.executeQuery(query);
+            rs.next();
+            author = rs.getString(1);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return author;
+    }
 
     public void search_by_cost_in_byn(Connection connection, int cost_in_byn) {
         Statement statement;
@@ -108,6 +287,67 @@ public class BookCRUD {
             System.out.println(e);
         }
     }
+    public int select_cost_in_byn_by_book_id(Connection connection, UUID book_id) {
+        Statement statement;
+        int cost_in_byn = 0;
+        ResultSet rs = null;
+        try {
+            String query = String.format("select cost_in_byn from book where book_id= '%s'",book_id );
+            statement = connection.createStatement();
+            rs = statement.executeQuery(query);
+            rs.next();
+            cost_in_byn= rs.getInt(1);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return cost_in_byn;
+    }
+    public int select_cost_in_byn_by_bookname(Connection connection, String bookname) {
+        Statement statement;
+        int cost_in_byn = 0;
+        ResultSet rs = null;
+        try {
+            String query = String.format("select cost_in_byn from book where bookname= '%s'",bookname );
+            statement = connection.createStatement();
+            rs = statement.executeQuery(query);
+            rs.next();
+            cost_in_byn= rs.getInt(1);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return cost_in_byn;
+    }
+    public int select_cost_in_byn_by_author(Connection connection, String author) {
+        Statement statement;
+        int cost_in_byn = 0;
+        ResultSet rs = null;
+        try {
+            String query = String.format("select cost_in_byn from book where author= '%s'",author );
+            statement = connection.createStatement();
+            rs = statement.executeQuery(query);
+            rs.next();
+            cost_in_byn= rs.getInt(1);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return cost_in_byn;
+    }
+    public int select_cost_in_byn_by_count_in_stock(Connection connection, int count_in_stock) {
+        Statement statement;
+        int cost_in_byn = 0;
+        ResultSet rs = null;
+        try {
+            String query = String.format("select cost_in_byn from book where count_in_stock= '%s'",count_in_stock );
+            statement = connection.createStatement();
+            rs = statement.executeQuery(query);
+            rs.next();
+            cost_in_byn= rs.getInt(1);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return cost_in_byn;
+    }
+
 
     public void search_by_count_in_stock(Connection connection, int count_in_stock) {
         Statement statement;
@@ -125,6 +365,66 @@ public class BookCRUD {
         } catch (Exception e) {
             System.out.println(e);
         }
+    }
+    public int select_count_in_stock_by_book_id(Connection connection, UUID book_id) {
+        Statement statement;
+        int count_in_stock = 0;
+        ResultSet rs = null;
+        try {
+            String query = String.format("select count_in_stock from book where book_id= '%s'",book_id );
+            statement = connection.createStatement();
+            rs = statement.executeQuery(query);
+            rs.next();
+            count_in_stock= rs.getInt(1);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return count_in_stock;
+    }
+    public int select_count_in_stock_by_bookname(Connection connection, String bookname) {
+        Statement statement;
+        int count_in_stock = 0;
+        ResultSet rs = null;
+        try {
+            String query = String.format("select count_in_stock from book where bookname= '%s'",bookname );
+            statement = connection.createStatement();
+            rs = statement.executeQuery(query);
+            rs.next();
+           count_in_stock= rs.getInt(1);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return count_in_stock;
+    }
+    public int select_count_in_stock_by_author(Connection connection, String author) {
+        Statement statement;
+        int count_in_stock = 0;
+        ResultSet rs = null;
+        try {
+            String query = String.format("select count_in_stock from book where author= '%s'",author );
+            statement = connection.createStatement();
+            rs = statement.executeQuery(query);
+            rs.next();
+            count_in_stock= rs.getInt(1);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return count_in_stock;
+    }
+    public int select_count_in_stock_by_cost_in_byn(Connection connection, int cost_in_byn) {
+        Statement statement;
+        int count_in_stock= 0;
+        ResultSet rs = null;
+        try {
+            String query = String.format("select count_in_stock from book where cost_in_byn= '%s'",cost_in_byn );
+            statement = connection.createStatement();
+            rs = statement.executeQuery(query);
+            rs.next();
+            count_in_stock= rs.getInt(1);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return count_in_stock;
     }
 
     public void update_book_id_by_book_id(Connection connection, UUID old_book_id, UUID new_book_id) {
