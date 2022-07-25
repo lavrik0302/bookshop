@@ -1,6 +1,8 @@
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class PersonCRUD {
@@ -52,6 +54,39 @@ public class PersonCRUD {
         } catch (Exception e) {
             System.out.println(e);
         }
+    }
+
+    public List select_custom(Connection connection, String exceptedColumns[], String[] tableColumns, String[] values) {
+        Statement statement;
+        List list = new ArrayList<>();
+        ResultSet rs = null;
+        try {
+            StringBuilder sb = new StringBuilder();
+            sb.append("select ");
+            for (String exceptedColumn : exceptedColumns) {
+                sb.append(exceptedColumn + ", ");
+            }
+            sb.deleteCharAt(sb.lastIndexOf(","));
+            sb.append(" from person where ");
+            int i = 0;
+            for (String tableColumn : tableColumns) {
+                sb.append(tableColumn + "='" + values[i] + "' AND ");
+                i++;
+            }
+            sb.delete(sb.length() - 4, sb.length());
+            sb.append(";");
+            System.out.println(sb.toString());
+            statement = connection.createStatement();
+            rs = statement.executeQuery(sb.toString());
+            rs.next();
+            for (int j = 1; j <= rs.getMetaData().getColumnCount(); j++) {
+                list.add(j - 1, rs.getObject(j));
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return list;
+
     }
 
     public UUID select_person_id_by_name(Connection connection, String name) {
