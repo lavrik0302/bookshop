@@ -1,8 +1,10 @@
-import controler.CartCrud;
 import controler.ConnectToDb;
-import controler.PersonCRUD;
+import controler.FindPersonRequest;
+import controler.PersonDAO;
+import model.Person;
 
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -10,28 +12,8 @@ public class Main {
     public static void main(String[] args) {
         ConnectToDb dbFunctions = new ConnectToDb();
         Connection connection = dbFunctions.connect_to_db("bookshop", "postgres", "postgrespw");
-        PersonCRUD personCRUD = new PersonCRUD();
-        CartCrud cartCrud = new CartCrud();
-        //UUID uuid=personCRUD.select_person_id_by_surname(connection,"Doe");
-        // cartCrud.insert_row_by_person_mobileNumber(connection, "+375298691234", "Lavrenchuk cart");
-      //  UUID uuid1 = UUID.fromString("7aecde76-319d-4826-8ac9-55460391fe7e");
-        // System.out.println(cartCrud.select_cart_id_by_person_id(connection,uuid1));
-      //  String[] excepted = {"name"};
-      //  String[] columnNames = {"surname", "mobilenumber"};
-      //  String[] values = {"Doe", "+375298690771"};
-       // List val = personCRUD.select_custom(connection, excepted, columnNames, values);
-       // System.out.println(val.get(0));
-        // System.out.println(val.get(1));
-        List a=personCRUD.read_data(connection);
-        //personCRUD.insert_row(connection, "Sam", "Colt", "+375291234567");
-        System.out.println(a.get(0));
-        System.out.println(a.get(1));
-        System.out.println(a.get(2));
-        System.out.println(a.get(3));
-        System.out.println(a.get(4));
-        List val =personCRUD.select_person_id_by_name(connection, "Sam");
-        System.out.println(val.get(0));
-        System.out.println(val.get(1));
-        System.out.println(val.get(2));
+        PersonDAO personDAO = new PersonDAO();
+        UUID uuid=UUID.fromString("46b42e1c-3d77-4b29-be35-ca62b41cb311");
+        personDAO.delete(connection, new FindPersonRequest().setPersonSurname("Colt").setPersonId(uuid));
     }
 }

@@ -9,8 +9,8 @@ public class Book {
     private UUID book_id;
     private String bookname;
     private String author;
-    private int cost_in_byn;
-    private int count_in_stock;
+    private int costInByn;
+    private int countInStock;
 
     public Book() {
     }
