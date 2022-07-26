@@ -1,3 +1,7 @@
+import controler.CartCrud;
+import controler.ConnectToDb;
+import controler.PersonCRUD;
+
 import java.sql.Connection;
 import java.util.List;
 import java.util.UUID;
@@ -10,13 +14,24 @@ public class Main {
         CartCrud cartCrud = new CartCrud();
         //UUID uuid=personCRUD.select_person_id_by_surname(connection,"Doe");
         // cartCrud.insert_row_by_person_mobileNumber(connection, "+375298691234", "Lavrenchuk cart");
-        UUID uuid1 = UUID.fromString("7aecde76-319d-4826-8ac9-55460391fe7e");
+      //  UUID uuid1 = UUID.fromString("7aecde76-319d-4826-8ac9-55460391fe7e");
         // System.out.println(cartCrud.select_cart_id_by_person_id(connection,uuid1));
-        String[] excepted = {"name"};
-        String[] columnNames = {"surname", "mobilenumber"};
-        String[] values = {"Doe", "+375298690771"};
-        List val = personCRUD.select_custom(connection, excepted, columnNames, values);
-        System.out.println(val.get(0));
+      //  String[] excepted = {"name"};
+      //  String[] columnNames = {"surname", "mobilenumber"};
+      //  String[] values = {"Doe", "+375298690771"};
+       // List val = personCRUD.select_custom(connection, excepted, columnNames, values);
+       // System.out.println(val.get(0));
         // System.out.println(val.get(1));
+        List a=personCRUD.read_data(connection);
+        //personCRUD.insert_row(connection, "Sam", "Colt", "+375291234567");
+        System.out.println(a.get(0));
+        System.out.println(a.get(1));
+        System.out.println(a.get(2));
+        System.out.println(a.get(3));
+        System.out.println(a.get(4));
+        List val =personCRUD.select_person_id_by_name(connection, "Sam");
+        System.out.println(val.get(0));
+        System.out.println(val.get(1));
+        System.out.println(val.get(2));
     }
 }

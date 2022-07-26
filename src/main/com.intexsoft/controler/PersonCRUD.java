@@ -1,3 +1,7 @@
+package controler;
+
+import model.Person;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -20,7 +24,8 @@ public class PersonCRUD {
         }
     }
 
-    public void read_data(Connection connection) {
+    public List<Person> read_data(Connection connection) {
+        List<Person> list = new ArrayList<>();
         Statement statement;
         ResultSet rs = null;
         try {
@@ -28,32 +33,38 @@ public class PersonCRUD {
             statement = connection.createStatement();
             rs = statement.executeQuery(query);
             while (rs.next()) {
-                for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
-                    System.out.print(rs.getString(i) + " ");
-                }
-                System.out.println();
+                Person person = new Person();
+                person.setPerson_id(rs.getObject(1, UUID.class));
+                person.setName(rs.getString(2));
+                person.setSurname(rs.getString(3));
+                person.setMobilenumber(rs.getString(4));
+                list.add(person);
             }
         } catch (Exception e) {
             System.out.println(e);
         }
+        return list;
     }
 
-    public void search_by_person_id(Connection connection, UUID person_id) {
+    public Person search_by_person_id(Connection connection, UUID person_id) {
         Statement statement;
         ResultSet rs = null;
+        Person person = new Person();
         try {
             String query = String.format("select * from person where person_id= '%s'", person_id);
             statement = connection.createStatement();
             rs = statement.executeQuery(query);
+
             while (rs.next()) {
-                for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
-                    System.out.print(rs.getString(i) + " ");
-                }
-                System.out.println();
+                person.setPerson_id(rs.getObject(1, UUID.class));
+                person.setName(rs.getString(2));
+                person.setSurname(rs.getString(3));
+                person.setMobilenumber(rs.getString(4));
             }
         } catch (Exception e) {
             System.out.println(e);
         }
+        return person;
     }
 
     public List select_custom(Connection connection, String exceptedColumns[], String[] tableColumns, String[] values) {
@@ -89,36 +100,42 @@ public class PersonCRUD {
 
     }
 
-    public UUID select_person_id_by_name(Connection connection, String name) {
+    public List<UUID> select_person_id_by_name(Connection connection, String name) {
         Statement statement;
+        List<UUID> list = new ArrayList<>();
         UUID uuid = null;
         ResultSet rs = null;
         try {
             String query = String.format("select person_id from person where name= '%s'", name);
             statement = connection.createStatement();
             rs = statement.executeQuery(query);
-            rs.next();
-            uuid = rs.getObject(1, UUID.class);
+            while (rs.next()) {
+                uuid = rs.getObject(1, UUID.class);
+                list.add(uuid);
+            }
         } catch (Exception e) {
             System.out.println(e);
         }
-        return uuid;
+        return list;
     }
 
-    public UUID select_person_id_by_surname(Connection connection, String surname) {
+    public List<UUID> select_person_id_by_surname(Connection connection, String surname) {
         Statement statement;
         UUID uuid = null;
+        List<UUID> list = new ArrayList<>();
         ResultSet rs = null;
         try {
             String query = String.format("select person_id from person where surname= '%s'", surname);
             statement = connection.createStatement();
             rs = statement.executeQuery(query);
-            rs.next();
-            uuid = rs.getObject(1, UUID.class);
+            while (rs.next()) {
+                uuid = rs.getObject(1, UUID.class);
+                list.add(uuid);
+            }
         } catch (Exception e) {
             System.out.println(e);
         }
-        return uuid;
+        return list;
     }
 
     public UUID select_person_id_by_mobileNumber(Connection connection, String mobileNumber) {
@@ -130,29 +147,33 @@ public class PersonCRUD {
             statement = connection.createStatement();
             rs = statement.executeQuery(query);
             rs.next();
-            uuid = rs.getObject(1, UUID.class);
+                uuid = rs.getObject(1, UUID.class);
         } catch (Exception e) {
             System.out.println(e);
         }
         return uuid;
     }
 
-    public void search_by_name(Connection connection, String name) {
+    public List<Person> search_by_name(Connection connection, String name) {
         Statement statement;
+        List<Person> list = new ArrayList<>();
         ResultSet rs = null;
         try {
             String query = String.format("select * from person where name= '%s'", name);
             statement = connection.createStatement();
             rs = statement.executeQuery(query);
             while (rs.next()) {
-                for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
-                    System.out.print(rs.getString(i) + " ");
-                }
-                System.out.println();
+                Person person = new Person();
+                person.setPerson_id(rs.getObject(1, UUID.class));
+                person.setName(rs.getString(2));
+                person.setSurname(rs.getString(3));
+                person.setMobilenumber(rs.getString(4));
+                list.add(person);
             }
         } catch (Exception e) {
             System.out.println(e);
         }
+        return list;
     }
 
     public String select_name_by_person_id(Connection connection, UUID person_id) {
@@ -164,27 +185,31 @@ public class PersonCRUD {
             statement = connection.createStatement();
             rs = statement.executeQuery(query);
             rs.next();
-            name = rs.getString(1);
+                name = rs.getString(2);
+
         } catch (Exception e) {
             System.out.println(e);
         }
         return name;
     }
 
-    public String select_name_by_surname(Connection connection, String surname) {
+    public List<String> select_name_by_surname(Connection connection, String surname) {
         Statement statement;
         String name = null;
+        List<String> list = new ArrayList<>();
         ResultSet rs = null;
         try {
             String query = String.format("select name from person where surname= '%s'", surname);
             statement = connection.createStatement();
             rs = statement.executeQuery(query);
-            rs.next();
-            name = rs.getString(1);
+            while (rs.next()) {
+                name = rs.getString(2);
+                list.add(name);
+            }
         } catch (Exception e) {
             System.out.println(e);
         }
-        return name;
+        return list;
     }
 
     public String select_name_by_mobileNumber(Connection connection, String mobileNumber) {
@@ -196,29 +221,34 @@ public class PersonCRUD {
             statement = connection.createStatement();
             rs = statement.executeQuery(query);
             rs.next();
-            name = rs.getString(1);
+                name = rs.getString(2);
+
         } catch (Exception e) {
             System.out.println(e);
         }
         return name;
     }
 
-    public void search_by_surname(Connection connection, String surname) {
+    public List<Person> search_by_surname(Connection connection, String surname) {
         Statement statement;
         ResultSet rs = null;
+        List<Person> list = new ArrayList<>();
         try {
             String query = String.format("select * from person where surname= '%s'", surname);
             statement = connection.createStatement();
             rs = statement.executeQuery(query);
             while (rs.next()) {
-                for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
-                    System.out.print(rs.getString(i) + " ");
-                }
-                System.out.println();
+                Person person = new Person();
+                person.setPerson_id(rs.getObject(1, UUID.class));
+                person.setName(rs.getString(2));
+                person.setSurname(rs.getString(3));
+                person.setMobilenumber(rs.getString(4));
+                list.add(person);
             }
         } catch (Exception e) {
             System.out.println(e);
         }
+        return list;
     }
 
     public String select_surname_by_person_id(Connection connection, UUID person_id) {
@@ -230,27 +260,30 @@ public class PersonCRUD {
             statement = connection.createStatement();
             rs = statement.executeQuery(query);
             rs.next();
-            surname = rs.getString(1);
+            surname = rs.getString(3);
         } catch (Exception e) {
             System.out.println(e);
         }
         return surname;
     }
 
-    public String select_surname_by_name(Connection connection, String name) {
+    public List<String> select_surname_by_name(Connection connection, String name) {
         Statement statement;
+        List<String> list = new ArrayList<>();
         String surname = null;
         ResultSet rs = null;
         try {
             String query = String.format("select surname from person where name= '%s'", name);
             statement = connection.createStatement();
             rs = statement.executeQuery(query);
-            rs.next();
-            surname = rs.getString(1);
+            while (rs.next()) {
+                surname = rs.getString(3);
+                list.add(surname);
+            }
         } catch (Exception e) {
             System.out.println(e);
         }
-        return surname;
+        return list;
     }
 
     public String select_surname_by_mobileNumber(Connection connection, String mobileNumber) {
@@ -262,29 +295,31 @@ public class PersonCRUD {
             statement = connection.createStatement();
             rs = statement.executeQuery(query);
             rs.next();
-            surname = rs.getString(1);
+            surname = rs.getString(3);
         } catch (Exception e) {
             System.out.println(e);
         }
         return surname;
     }
 
-    public void search_by_mobileNumber(Connection connection, String mobileNumber) {
+    public Person search_by_mobileNumber(Connection connection, String mobileNumber) {
         Statement statement;
         ResultSet rs = null;
+        Person person = new Person();
         try {
             String query = String.format("select * from person where mobilenumber= '%s'", mobileNumber);
             statement = connection.createStatement();
             rs = statement.executeQuery(query);
             while (rs.next()) {
-                for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
-                    System.out.print(rs.getString(i) + " ");
-                }
-                System.out.println();
+                person.setPerson_id(rs.getObject(1, UUID.class));
+                person.setName(rs.getString(2));
+                person.setSurname(rs.getString(3));
+                person.setMobilenumber(rs.getString(4));
             }
         } catch (Exception e) {
             System.out.println(e);
         }
+        return person;
     }
 
     public String select_mobileNumber_by_person_id(Connection connection, UUID person_id) {
@@ -296,7 +331,7 @@ public class PersonCRUD {
             statement = connection.createStatement();
             rs = statement.executeQuery(query);
             rs.next();
-            mobileNumber = rs.getString(1);
+            mobileNumber = rs.getString(4);
         } catch (Exception e) {
             System.out.println(e);
         }
@@ -312,7 +347,7 @@ public class PersonCRUD {
             statement = connection.createStatement();
             rs = statement.executeQuery(query);
             rs.next();
-            mobileNumber = rs.getString(1);
+            mobileNumber = rs.getString(4);
         } catch (Exception e) {
             System.out.println(e);
         }
@@ -328,7 +363,7 @@ public class PersonCRUD {
             statement = connection.createStatement();
             rs = statement.executeQuery(query);
             rs.next();
-            mobileNumber = rs.getString(1);
+            mobileNumber = rs.getString(4);
         } catch (Exception e) {
             System.out.println(e);
         }

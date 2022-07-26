@@ -1,3 +1,5 @@
+package controler;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -21,10 +23,10 @@ public class CartCrud {
         try {
             UUID uuid = UUID.randomUUID();
             PersonCRUD personCRUD=new PersonCRUD();
-            UUID person_id = personCRUD.select_person_id_by_name(connection,name);
-            String query = "insert into cart values ('" + uuid + "', '" + person_id + "', '" + cart_name + "');";
+            //UUID person_id = personCRUD.select_person_id_by_name(connection,name);
+           // String query = "insert into cart values ('" + uuid + "', '" + person_id + "', '" + cart_name + "');";
             statement = connection.createStatement();
-            statement.executeUpdate(query);
+           // statement.executeUpdate(query);
             System.out.println("Insert success");
         } catch (Exception e) {
             System.out.println(e);
