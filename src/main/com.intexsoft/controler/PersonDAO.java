@@ -217,6 +217,35 @@ public class PersonDAO {
         }
     }
 
+    public void updatePerson(Connection connection, Person person, FindPersonRequest findPersonRequest) {
+        Statement statement;
+        try {
+            StringBuilder sb = new StringBuilder();
+            sb.append("update person set person_id='" + person.getPersonId() + "', name='" + person.getName() + "', surname='" + person.getSurname() + "', mobilenumber='" + person.getMobilenumber() + "' ");
+            sb.append("where ");
+            if (!findPersonRequest.getPersonIds().isEmpty()) {
+                sb.append("person_id='" + findPersonRequest.getPersonIds().get(0) + "' AND ");
+            }
+            if (!findPersonRequest.getPersonNames().isEmpty()) {
+                sb.append("name='" + findPersonRequest.getPersonNames().get(0) + "' AND ");
+            }
+            if (!findPersonRequest.getPersonSurnames().isEmpty()) {
+                sb.append("surname='" + findPersonRequest.getPersonSurnames().get(0) + "' AND ");
+            }
+            if (!findPersonRequest.getPersonMobilenumbers().isEmpty()) {
+                sb.append("mobilenumber='" + findPersonRequest.getPersonMobilenumbers().get(0) + "' AND ");
+            }
+            sb.delete(sb.length() - 4, sb.length());
+            sb.append(";");
+            System.out.println(sb.toString());
+            statement = connection.createStatement();
+            statement.executeUpdate(sb.toString());
+            System.out.println("Data updated");
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
     public void delete(Connection connection, FindPersonRequest findPersonRequest) {
         Statement statement;
         try {

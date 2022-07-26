@@ -6,7 +6,7 @@ import java.util.UUID;
 
 @Data
 public class Book {
-    private UUID book_id;
+    private UUID bookId;
     private String bookname;
     private String author;
     private int costInByn;

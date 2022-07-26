@@ -1,6 +1,8 @@
+import controler.BookDAO;
 import controler.ConnectToDb;
 import controler.FindPersonRequest;
 import controler.PersonDAO;
+import model.Book;
 import model.Person;
 
 import java.sql.Connection;
@@ -12,8 +14,15 @@ public class Main {
     public static void main(String[] args) {
         ConnectToDb dbFunctions = new ConnectToDb();
         Connection connection = dbFunctions.connect_to_db("bookshop", "postgres", "postgrespw");
-        PersonDAO personDAO = new PersonDAO();
-        UUID uuid=UUID.fromString("46b42e1c-3d77-4b29-be35-ca62b41cb311");
-        personDAO.delete(connection, new FindPersonRequest().setPersonSurname("Colt").setPersonId(uuid));
+        BookDAO bookDAO = new BookDAO();
+        UUID uuid = UUID.fromString("269acb18-99b3-4a76-b21f-19669c6f8db6");
+        Book book = new Book();
+        book.setBookId(UUID.randomUUID());
+        book.setBookname("Black Tower");
+        book.setAuthor("Akunin");
+        book.setCostInByn(29);
+        book.setCountInStock(6);
+        bookDAO.createBook(connection, book);
+        System.out.println(bookDAO.readAll(connection).size());
     }
 }
