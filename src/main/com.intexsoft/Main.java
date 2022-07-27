@@ -2,6 +2,7 @@ import controler.*;
 import controler.DAOs.BookDAO;
 import controler.DAOs.CartDAO;
 import controler.DAOs.PersonDAO;
+import controler.FindRequests.FindBookRequest;
 import controler.FindRequests.FindCartRequest;
 import controler.FindRequests.FindPersonRequest;
 
@@ -15,6 +16,5 @@ public class Main {
         BookDAO bookDAO = new BookDAO();
         PersonDAO personDAO = new PersonDAO();
         CartDAO cartDAO = new CartDAO();
-        System.out.println(personDAO.readAllWithCart(connection));
     }
 }

@@ -1,10 +1,12 @@
 package model;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
 @Data
+@NoArgsConstructor
 public class Person {
 
     private UUID personId;
@@ -12,8 +14,5 @@ public class Person {
     private String surname;
     private String mobilenumber;
     private Cart personCart;
-
-    public Person() {
-    }
 
 }

@@ -11,10 +11,16 @@ import java.util.List;
 import java.util.UUID;
 
 public class BookDAO {
-    public void createRow(Connection connection, String bookname, String author, int costInByn, int countInStock) {
+    public Book createRow(Connection connection, String bookname, String author, int costInByn, int countInStock) {
         Statement statement;
+        Book book = new Book();
         try {
             UUID uuid = UUID.randomUUID();
+            book.setBookId(uuid);
+            book.setBookname(bookname);
+            book.setAuthor(author);
+            book.setCostInByn(costInByn);
+            book.setCountInStock(countInStock);
             String query = "insert into book values ('" + uuid + "', '" + bookname + "', '" + author + "', " + costInByn + ", " + countInStock + ");";
             statement = connection.createStatement();
             statement.executeUpdate(query);
@@ -22,9 +28,10 @@ public class BookDAO {
         } catch (Exception e) {
             System.out.println(e);
         }
+        return book;
     }
 
-    public void createBook(Connection connection, Book book) {
+    public Book createBook(Connection connection, Book book) {
         Statement statement;
         try {
             String query = "insert into book values ('" + book.getBookId() + "', '" + book.getBookname() + "', '" + book.getAuthor() + "', " + book.getCostInByn() + ", " + book.getCountInStock() + ");";
@@ -34,6 +41,7 @@ public class BookDAO {
         } catch (Exception e) {
             System.out.println(e);
         }
+        return book;
     }
 
     public List<Book> readAll(Connection connection) {
@@ -106,32 +114,31 @@ public class BookDAO {
                     sb.append("='" + findBookRequest.getBookAuthors().get(0) + "' AND ");
                 }
             }
-            if (!findBookRequest.getBookCostInByns().isEmpty()) {
+            if (findBookRequest.getBookMoreThanCostInByns() != null) {
                 sb.append("cost_in_byn ");
-                if (findBookRequest.getBookCostInByns().size() > 1) {
-                    sb.append("in (");
-                    for (int cost_in_byn : findBookRequest.getBookCostInByns()) {
-                        sb.append("'" + cost_in_byn + "', ");
-                    }
-                    sb.deleteCharAt(sb.lastIndexOf(","));
-                    sb.append(") AND ");
-                } else {
-                    sb.append("='" + findBookRequest.getBookCostInByns().get(0) + "' AND ");
-                }
+                sb.append(">='" + findBookRequest.getBookMoreThanCostInByns() + "' AND ");
             }
-            if (!findBookRequest.getBookCountInStocks().isEmpty()) {
+            if (findBookRequest.getBookLessThanCostInByns() != null) {
+                sb.append("cost_in_byn ");
+                sb.append("<='" + findBookRequest.getBookLessThanCostInByns() + "' AND ");
+            }
+            if (findBookRequest.getBookCostInByns() != null) {
+                sb.append("cost_in_byn='" + findBookRequest.getBookCostInByns() + "' AND ");
+            }
+
+
+            if (findBookRequest.getBookMoreThanCountInStocks() != null) {
                 sb.append("count_in_stock ");
-                if (findBookRequest.getBookCountInStocks().size() > 1) {
-                    sb.append("in (");
-                    for (int count_in_stock : findBookRequest.getBookCountInStocks()) {
-                        sb.append("'" + count_in_stock + "', ");
-                    }
-                    sb.deleteCharAt(sb.lastIndexOf(","));
-                    sb.append(") AND ");
-                } else {
-                    sb.append("='" + findBookRequest.getBookCountInStocks().get(0) + "' AND ");
-                }
+                sb.append(">='" + findBookRequest.getBookMoreThanCountInStocks() + "' AND ");
             }
+            if (findBookRequest.getBookLessThanCountInStocks() != null) {
+                sb.append("count_in_stock ");
+                sb.append("<='" + findBookRequest.getBookLessThanCountInStocks() + "' AND ");
+            }
+            if (findBookRequest.getBookCountInStocks() != null) {
+                sb.append("count_in_stock='" + findBookRequest.getBookCountInStocks() + "' AND ");
+            }
+
 
             sb.delete(sb.length() - 4, sb.length());
             sb.append(";");
@@ -166,10 +173,10 @@ public class BookDAO {
                 sb.append("bookname" + "='" + updateBookRequest.getBookBooknames().get(0) + "', ");
             if (!updateBookRequest.getBookAuthors().isEmpty())
                 sb.append("author" + "='" + updateBookRequest.getBookAuthors().get(0) + "', ");
-            if (!updateBookRequest.getBookCostInByns().isEmpty())
-                sb.append("cost_in_byn" + "='" + updateBookRequest.getBookCostInByns().get(0) + "', ");
-            if (!updateBookRequest.getBookCountInStocks().isEmpty())
-                sb.append("count_in_stock" + "='" + updateBookRequest.getBookCountInStocks().get(0) + "', ");
+            if (updateBookRequest.getBookCostInByns() != null)
+                sb.append("cost_in_byn" + "='" + updateBookRequest.getBookCostInByns() + "', ");
+            if (updateBookRequest.getBookCountInStocks()!=null)
+                sb.append("count_in_stock" + "='" + updateBookRequest.getBookCountInStocks() + "', ");
             sb.deleteCharAt(sb.lastIndexOf(","));
             sb.append("where ");
             if (!findBookRequest.getBookIds().isEmpty()) {
@@ -211,32 +218,30 @@ public class BookDAO {
                     sb.append("='" + findBookRequest.getBookAuthors().get(0) + "' AND ");
                 }
             }
-            if (!findBookRequest.getBookCostInByns().isEmpty()) {
+            if (findBookRequest.getBookMoreThanCostInByns() != null) {
                 sb.append("cost_in_byn ");
-                if (findBookRequest.getBookCostInByns().size() > 1) {
-                    sb.append("in (");
-                    for (int cost_in_byn : findBookRequest.getBookCostInByns()) {
-                        sb.append("'" + cost_in_byn + "', ");
-                    }
-                    sb.deleteCharAt(sb.lastIndexOf(","));
-                    sb.append(") AND ");
-                } else {
-                    sb.append("='" + findBookRequest.getBookCostInByns().get(0) + "' AND ");
-                }
+                sb.append(">='" + findBookRequest.getBookMoreThanCostInByns() + "' AND ");
             }
-            if (!findBookRequest.getBookCountInStocks().isEmpty()) {
+            if (findBookRequest.getBookLessThanCostInByns() != null) {
+                sb.append("cost_in_byn ");
+                sb.append("<='" + findBookRequest.getBookLessThanCostInByns() + "' AND ");
+            }
+            if (findBookRequest.getBookCostInByns() != null) {
+                sb.append("cost_in_byn='" + findBookRequest.getBookCostInByns() + "' AND ");
+            }
+
+            if (findBookRequest.getBookMoreThanCountInStocks() != null) {
                 sb.append("count_in_stock ");
-                if (findBookRequest.getBookCountInStocks().size() > 1) {
-                    sb.append("in (");
-                    for (int count_in_stock : findBookRequest.getBookCountInStocks()) {
-                        sb.append("'" + count_in_stock + "', ");
-                    }
-                    sb.deleteCharAt(sb.lastIndexOf(","));
-                    sb.append(") AND ");
-                } else {
-                    sb.append("='" + findBookRequest.getBookCountInStocks().get(0) + "' AND ");
-                }
+                sb.append(">='" + findBookRequest.getBookMoreThanCountInStocks() + "' AND ");
             }
+            if (findBookRequest.getBookLessThanCountInStocks() != null) {
+                sb.append("count_in_stock ");
+                sb.append("<='" + findBookRequest.getBookLessThanCountInStocks() + "' AND ");
+            }
+            if (findBookRequest.getBookCountInStocks() != null) {
+                sb.append("count_in_stock='" + findBookRequest.getBookCountInStocks() + "' AND ");
+            }
+
             sb.delete(sb.length() - 4, sb.length());
             sb.append(";");
             System.out.println(sb.toString());
@@ -248,36 +253,11 @@ public class BookDAO {
         }
     }
 
-    public void updateBook(Connection connection, Book book, FindBookRequest findBookRequest) {
-        Statement statement;
-        try {
-            StringBuilder sb = new StringBuilder();
-            sb.append("update book set book_id='" + book.getBookId() + "', bookname='" + book.getBookname() + "', author='" + book.getAuthor() + "', cost_in_byn='" + book.getCostInByn() + "', count_in_stock='"+book.getCountInStock()+"' ");
-            sb.append("where ");
-            if (!findBookRequest.getBookIds().isEmpty()) {
-                sb.append("book_id='" + findBookRequest.getBookIds().get(0) + "' AND ");
-            }
-            if (!findBookRequest.getBookBooknames().isEmpty()) {
-                sb.append("bookname='" + findBookRequest.getBookBooknames().get(0) + "' AND ");
-            }
-            if (!findBookRequest.getBookAuthors().isEmpty()) {
-                sb.append("author='" + findBookRequest.getBookAuthors().get(0) + "' AND ");
-            }
-            if (!findBookRequest.getBookCostInByns().isEmpty()) {
-                sb.append("cost_in_byn='" + findBookRequest.getBookCostInByns().get(0) + "' AND ");
-            }
-            if (!findBookRequest.getBookCountInStocks().isEmpty()) {
-                sb.append("count_in_stock='" + findBookRequest.getBookCountInStocks().get(0) + "' AND ");
-            }
-            sb.delete(sb.length() - 4, sb.length());
-            sb.append(";");
-            System.out.println(sb.toString());
-            statement = connection.createStatement();
-            statement.executeUpdate(sb.toString());
-            System.out.println("Data updated");
-        } catch (Exception e) {
-            System.out.println(e);
-        }
+    public Book updateBook(Connection connection, Book book, FindBookRequest findBookRequest) {
+        FindBookRequest updateBookRequest = new FindBookRequest();
+        updateBookRequest.setBookId(book.getBookId()).setBookBookname(book.getBookname()).setBookAuthor(book.getAuthor()).setBookCostInByn(book.getCostInByn()).setBookCountInStock(book.getCountInStock());
+        update(connection, updateBookRequest, findBookRequest);
+        return book;
     }
 
     public void delete(Connection connection, FindBookRequest findBookRequest) {
@@ -324,32 +304,27 @@ public class BookDAO {
                     sb.append("='" + findBookRequest.getBookAuthors().get(0) + "' AND ");
                 }
             }
-            if (!findBookRequest.getBookCostInByns().isEmpty()) {
+            if (findBookRequest.getBookMoreThanCostInByns() != null) {
                 sb.append("cost_in_byn ");
-                if (findBookRequest.getBookCostInByns().size() > 1) {
-                    sb.append("in (");
-                    for (int cost_in_byn : findBookRequest.getBookCostInByns()) {
-                        sb.append("'" + cost_in_byn + "', ");
-                    }
-                    sb.deleteCharAt(sb.lastIndexOf(","));
-                    sb.append(") AND ");
-                } else {
-                    sb.append("='" + findBookRequest.getBookCostInByns().get(0) + "' AND ");
-                }
+                sb.append(">='" + findBookRequest.getBookMoreThanCostInByns() + "' AND ");
             }
-
-            if (!findBookRequest.getBookCountInStocks().isEmpty()) {
+            if (findBookRequest.getBookLessThanCostInByns() != null) {
+                sb.append("cost_in_byn ");
+                sb.append("<='" + findBookRequest.getBookLessThanCostInByns() + "' AND ");
+            }
+            if (findBookRequest.getBookCostInByns() != null) {
+                sb.append("cost_in_byn='" + findBookRequest.getBookCostInByns() + "' AND ");
+            }
+            if (findBookRequest.getBookMoreThanCountInStocks() != null) {
                 sb.append("count_in_stock ");
-                if (findBookRequest.getBookCountInStocks().size() > 1) {
-                    sb.append("in (");
-                    for (int count_in_stock : findBookRequest.getBookCountInStocks()) {
-                        sb.append("'" + count_in_stock + "', ");
-                    }
-                    sb.deleteCharAt(sb.lastIndexOf(","));
-                    sb.append(") AND ");
-                } else {
-                    sb.append("='" + findBookRequest.getBookCountInStocks().get(0) + "' AND ");
-                }
+                sb.append(">='" + findBookRequest.getBookMoreThanCountInStocks() + "' AND ");
+            }
+            if (findBookRequest.getBookLessThanCountInStocks() != null) {
+                sb.append("count_in_stock ");
+                sb.append("<='" + findBookRequest.getBookLessThanCountInStocks() + "' AND ");
+            }
+            if (findBookRequest.getBookCountInStocks() != null) {
+                sb.append("count_in_stock='" + findBookRequest.getBookCountInStocks() + "' AND ");
             }
             sb.delete(sb.length() - 4, sb.length());
             sb.append(";");
