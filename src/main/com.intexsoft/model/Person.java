@@ -11,6 +11,7 @@ public class Person {
     private String name;
     private String surname;
     private String mobilenumber;
+    private Cart personCart;
 
     public Person() {
     }

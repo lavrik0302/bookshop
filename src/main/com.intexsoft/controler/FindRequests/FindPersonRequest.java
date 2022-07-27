@@ -1,7 +1,6 @@
-package controler;
+package controler.FindRequests;
 
 import lombok.Data;
-import model.Person;
 
 import java.util.ArrayList;
 import java.util.List;

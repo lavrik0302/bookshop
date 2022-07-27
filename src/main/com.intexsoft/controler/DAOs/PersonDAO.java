@@ -1,5 +1,7 @@
-package controler;
+package controler.DAOs;
 
+import controler.FindRequests.FindPersonRequest;
+import model.Cart;
 import model.Person;
 
 import java.sql.Connection;
@@ -50,6 +52,43 @@ public class PersonDAO {
                 person.setName(rs.getString(2));
                 person.setSurname(rs.getString(3));
                 person.setMobilenumber(rs.getString(4));
+
+                list.add(person);
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return list;
+    }
+
+    public List<Person> readAllWithCart(Connection connection) {
+        List<Person> list = new ArrayList<>();
+        Statement statement;
+        ResultSet rs = null;
+        try {
+            String query = "select * from person";
+            statement = connection.createStatement();
+            rs = statement.executeQuery(query);
+            System.out.println(query);
+            while (rs.next()) {
+                Person person = new Person();
+                person.setPersonId(rs.getObject(1, UUID.class));
+                person.setName(rs.getString(2));
+                person.setSurname(rs.getString(3));
+                person.setMobilenumber(rs.getString(4));
+                Cart cart = new Cart();
+                Statement statementForCart;
+                ResultSet rsForCart;
+                String cartQuery = "select * from cart where person_id='" + person.getPersonId() + "';";
+                statementForCart = connection.createStatement();
+                rsForCart = statementForCart.executeQuery(cartQuery);
+                System.out.println(cartQuery);
+                if (rsForCart.next()) {
+                    cart.setCart_id(rsForCart.getObject(1, UUID.class));
+                    cart.setPerson_id(rsForCart.getObject(2, UUID.class));
+                    cart.setCartname(rsForCart.getString(3));
+                    person.setPersonCart(cart);
+                }
                 list.add(person);
             }
         } catch (Exception e) {
@@ -137,6 +176,99 @@ public class PersonDAO {
         }
         return list;
     }
+
+    public List<Person> findWithCart(Connection connection, FindPersonRequest findPersonRequest) {
+        Statement statement;
+        List<Person> list = new ArrayList<>();
+        ResultSet rs = null;
+        try {
+            StringBuilder sb = new StringBuilder();
+            sb.append("select * from person where ");
+
+            if (!findPersonRequest.getPersonIds().isEmpty()) {
+                sb.append("person_id ");
+                if (findPersonRequest.getPersonIds().size() > 1) {
+                    sb.append("in (");
+                    for (UUID person_id : findPersonRequest.getPersonIds()) {
+                        sb.append("'" + person_id + "', ");
+                    }
+                    sb.deleteCharAt(sb.lastIndexOf(","));
+                    sb.append(") AND ");
+                } else {
+                    sb.append("='" + findPersonRequest.getPersonIds().get(0) + "' AND ");
+                }
+            }
+            if (!findPersonRequest.getPersonNames().isEmpty()) {
+                sb.append("name ");
+                if (findPersonRequest.getPersonNames().size() > 1) {
+                    sb.append("in (");
+                    for (String name : findPersonRequest.getPersonNames()) {
+                        sb.append("'" + name + "', ");
+                    }
+                    sb.deleteCharAt(sb.lastIndexOf(","));
+                    sb.append(") AND ");
+                } else {
+                    sb.append("='" + findPersonRequest.getPersonNames().get(0) + "' AND ");
+                }
+            }
+            if (!findPersonRequest.getPersonSurnames().isEmpty()) {
+                sb.append("surname ");
+                if (findPersonRequest.getPersonSurnames().size() > 1) {
+                    sb.append("in (");
+                    for (String surname : findPersonRequest.getPersonSurnames()) {
+                        sb.append("'" + surname + "', ");
+                    }
+                    sb.deleteCharAt(sb.lastIndexOf(","));
+                    sb.append(") AND ");
+                } else {
+                    sb.append("='" + findPersonRequest.getPersonSurnames().get(0) + "' AND ");
+                }
+            }
+            if (!findPersonRequest.getPersonMobilenumbers().isEmpty()) {
+                sb.append("mobilenumber ");
+                if (findPersonRequest.getPersonMobilenumbers().size() > 1) {
+                    sb.append("in (");
+                    for (String mobilenumber : findPersonRequest.getPersonMobilenumbers()) {
+                        sb.append("'" + mobilenumber + "', ");
+                    }
+                    sb.deleteCharAt(sb.lastIndexOf(","));
+                    sb.append(") AND ");
+                } else {
+                    sb.append("='" + findPersonRequest.getPersonMobilenumbers().get(0) + "' AND ");
+                }
+            }
+
+            sb.delete(sb.length() - 4, sb.length());
+            sb.append(";");
+            System.out.println(sb.toString());
+            statement = connection.createStatement();
+            rs = statement.executeQuery(sb.toString());
+            while (rs.next()) {
+                Person person = new Person();
+                person.setPersonId(rs.getObject(1, UUID.class));
+                person.setName(rs.getString(2));
+                person.setSurname(rs.getString(3));
+                person.setMobilenumber(rs.getString(4));
+                Cart cart = new Cart();
+                Statement statementForCart;
+                ResultSet rsForCart;
+                String query = "select * from cart where person_id='" + person.getPersonId() + "';";
+                statementForCart = connection.createStatement();
+                rsForCart = statementForCart.executeQuery(query);
+                System.out.println(query);
+                rsForCart.next();
+                cart.setCart_id(rsForCart.getObject(1, UUID.class));
+                cart.setPerson_id(rsForCart.getObject(2, UUID.class));
+                cart.setCartname(rsForCart.getString(3));
+                person.setPersonCart(cart);
+                list.add(person);
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return list;
+    }
+
 
     public void update(Connection connection, FindPersonRequest updatePersonRequest, FindPersonRequest findPersonRequest) {
         Statement statement;
