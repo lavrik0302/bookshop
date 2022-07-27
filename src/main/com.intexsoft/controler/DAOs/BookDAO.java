@@ -1,6 +1,7 @@
 package controler.DAOs;
 
 import controler.FindRequests.FindBookRequest;
+import controler.UpdateRequests.UpdateBookRequest;
 import model.Book;
 
 import java.sql.Connection;
@@ -161,18 +162,18 @@ public class BookDAO {
     }
 
 
-    public void update(Connection connection, FindBookRequest updateBookRequest, FindBookRequest findBookRequest) {
+    public void update(Connection connection, UpdateBookRequest updateBookRequest, FindBookRequest findBookRequest) {
         Statement statement;
         try {
             StringBuilder sb = new StringBuilder();
             sb.append("update book set ");
 
-            if (!updateBookRequest.getBookIds().isEmpty())
-                sb.append("book_id" + "='" + updateBookRequest.getBookIds().get(0) + "', ");
-            if (!updateBookRequest.getBookBooknames().isEmpty())
-                sb.append("bookname" + "='" + updateBookRequest.getBookBooknames().get(0) + "', ");
-            if (!updateBookRequest.getBookAuthors().isEmpty())
-                sb.append("author" + "='" + updateBookRequest.getBookAuthors().get(0) + "', ");
+            if (updateBookRequest.getBookIds()!=null)
+                sb.append("book_id" + "='" + updateBookRequest.getBookIds() + "', ");
+            if (updateBookRequest.getBookBooknames()!=null)
+                sb.append("bookname" + "='" + updateBookRequest.getBookBooknames() + "', ");
+            if (updateBookRequest.getBookAuthors()!=null)
+                sb.append("author" + "='" + updateBookRequest.getBookAuthors()+ "', ");
             if (updateBookRequest.getBookCostInByns() != null)
                 sb.append("cost_in_byn" + "='" + updateBookRequest.getBookCostInByns() + "', ");
             if (updateBookRequest.getBookCountInStocks()!=null)
@@ -254,7 +255,7 @@ public class BookDAO {
     }
 
     public Book updateBook(Connection connection, Book book, FindBookRequest findBookRequest) {
-        FindBookRequest updateBookRequest = new FindBookRequest();
+        UpdateBookRequest updateBookRequest = new UpdateBookRequest();
         updateBookRequest.setBookId(book.getBookId()).setBookBookname(book.getBookname()).setBookAuthor(book.getAuthor()).setBookCostInByn(book.getCostInByn()).setBookCountInStock(book.getCountInStock());
         update(connection, updateBookRequest, findBookRequest);
         return book;

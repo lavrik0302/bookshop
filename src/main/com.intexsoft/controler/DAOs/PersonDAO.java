@@ -1,6 +1,7 @@
 package controler.DAOs;
 
 import controler.FindRequests.FindPersonRequest;
+import controler.UpdateRequests.UpdatePersonRequest;
 import model.Cart;
 import model.Person;
 
@@ -103,62 +104,7 @@ public class PersonDAO {
         try {
             StringBuilder sb = new StringBuilder();
             sb.append("select * from person where ");
-
-            if (!findPersonRequest.getPersonIds().isEmpty()) {
-                sb.append("person_id ");
-                if (findPersonRequest.getPersonIds().size() > 1) {
-                    sb.append("in (");
-                    for (UUID person_id : findPersonRequest.getPersonIds()) {
-                        sb.append("'" + person_id + "', ");
-                    }
-                    sb.deleteCharAt(sb.lastIndexOf(","));
-                    sb.append(") AND ");
-                } else {
-                    sb.append("='" + findPersonRequest.getPersonIds().get(0) + "' AND ");
-                }
-            }
-            if (!findPersonRequest.getPersonNames().isEmpty()) {
-                sb.append("name ");
-                if (findPersonRequest.getPersonNames().size() > 1) {
-                    sb.append("in (");
-                    for (String name : findPersonRequest.getPersonNames()) {
-                        sb.append("'" + name + "', ");
-                    }
-                    sb.deleteCharAt(sb.lastIndexOf(","));
-                    sb.append(") AND ");
-                } else {
-                    sb.append("='" + findPersonRequest.getPersonNames().get(0) + "' AND ");
-                }
-            }
-            if (!findPersonRequest.getPersonSurnames().isEmpty()) {
-                sb.append("surname ");
-                if (findPersonRequest.getPersonSurnames().size() > 1) {
-                    sb.append("in (");
-                    for (String surname : findPersonRequest.getPersonSurnames()) {
-                        sb.append("'" + surname + "', ");
-                    }
-                    sb.deleteCharAt(sb.lastIndexOf(","));
-                    sb.append(") AND ");
-                } else {
-                    sb.append("='" + findPersonRequest.getPersonSurnames().get(0) + "' AND ");
-                }
-            }
-            if (!findPersonRequest.getPersonMobilenumbers().isEmpty()) {
-                sb.append("mobilenumber ");
-                if (findPersonRequest.getPersonMobilenumbers().size() > 1) {
-                    sb.append("in (");
-                    for (String mobilenumber : findPersonRequest.getPersonMobilenumbers()) {
-                        sb.append("'" + mobilenumber + "', ");
-                    }
-                    sb.deleteCharAt(sb.lastIndexOf(","));
-                    sb.append(") AND ");
-                } else {
-                    sb.append("='" + findPersonRequest.getPersonMobilenumbers().get(0) + "' AND ");
-                }
-            }
-
-            sb.delete(sb.length() - 4, sb.length());
-            sb.append(";");
+            sb.append(findPersonRequest.toSQLStatement());
             System.out.println(sb.toString());
             statement = connection.createStatement();
             rs = statement.executeQuery(sb.toString());
@@ -183,62 +129,7 @@ public class PersonDAO {
         try {
             StringBuilder sb = new StringBuilder();
             sb.append("select person.person_id, person.name, person.surname, person.mobilenumber, cart.cart_id, cart.cart_name from person left join cart on person.person_id=cart.person_id where ");
-
-            if (!findPersonRequest.getPersonIds().isEmpty()) {
-                sb.append("person.person_id ");
-                if (findPersonRequest.getPersonIds().size() > 1) {
-                    sb.append("in (");
-                    for (UUID person_id : findPersonRequest.getPersonIds()) {
-                        sb.append("'" + person_id + "', ");
-                    }
-                    sb.deleteCharAt(sb.lastIndexOf(","));
-                    sb.append(") AND ");
-                } else {
-                    sb.append("='" + findPersonRequest.getPersonIds().get(0) + "' AND ");
-                }
-            }
-            if (!findPersonRequest.getPersonNames().isEmpty()) {
-                sb.append("person.name ");
-                if (findPersonRequest.getPersonNames().size() > 1) {
-                    sb.append("in (");
-                    for (String name : findPersonRequest.getPersonNames()) {
-                        sb.append("'" + name + "', ");
-                    }
-                    sb.deleteCharAt(sb.lastIndexOf(","));
-                    sb.append(") AND ");
-                } else {
-                    sb.append("='" + findPersonRequest.getPersonNames().get(0) + "' AND ");
-                }
-            }
-            if (!findPersonRequest.getPersonSurnames().isEmpty()) {
-                sb.append("person.surname ");
-                if (findPersonRequest.getPersonSurnames().size() > 1) {
-                    sb.append("in (");
-                    for (String surname : findPersonRequest.getPersonSurnames()) {
-                        sb.append("'" + surname + "', ");
-                    }
-                    sb.deleteCharAt(sb.lastIndexOf(","));
-                    sb.append(") AND ");
-                } else {
-                    sb.append("='" + findPersonRequest.getPersonSurnames().get(0) + "' AND ");
-                }
-            }
-            if (!findPersonRequest.getPersonMobilenumbers().isEmpty()) {
-                sb.append("person.mobilenumber ");
-                if (findPersonRequest.getPersonMobilenumbers().size() > 1) {
-                    sb.append("in (");
-                    for (String mobilenumber : findPersonRequest.getPersonMobilenumbers()) {
-                        sb.append("'" + mobilenumber + "', ");
-                    }
-                    sb.deleteCharAt(sb.lastIndexOf(","));
-                    sb.append(") AND ");
-                } else {
-                    sb.append("='" + findPersonRequest.getPersonMobilenumbers().get(0) + "' AND ");
-                }
-            }
-            sb.delete(sb.length() - 4, sb.length());
-            sb.append("");
-
+            sb.append(findPersonRequest.toSQLStatement());
             System.out.println(sb.toString());
             statement = connection.createStatement();
             rs = statement.executeQuery(sb.toString());
@@ -262,78 +153,25 @@ public class PersonDAO {
     }
 
 
-    public void update(Connection connection, FindPersonRequest updatePersonRequest, FindPersonRequest findPersonRequest) {
+    public void update(Connection connection, UpdatePersonRequest updatePersonRequest, FindPersonRequest findPersonRequest) {
         Statement statement;
         Person person;
         try {
             StringBuilder sb = new StringBuilder();
             sb.append("update person set ");
 
-            if (!updatePersonRequest.getPersonIds().isEmpty())
-                sb.append("person_id" + "='" + updatePersonRequest.getPersonIds().get(0) + "', ");
+            if (updatePersonRequest.getPersonIds() != null)
+                sb.append("person_id" + "='" + updatePersonRequest.getPersonIds() + "', ");
 
-            if (!updatePersonRequest.getPersonNames().isEmpty())
-                sb.append("name" + "='" + updatePersonRequest.getPersonNames().get(0) + "', ");
-            if (!updatePersonRequest.getPersonSurnames().isEmpty())
-                sb.append("surname" + "='" + updatePersonRequest.getPersonSurnames().get(0) + "', ");
-            if (!updatePersonRequest.getPersonMobilenumbers().isEmpty())
-                sb.append("mobilenumber" + "='" + updatePersonRequest.getPersonMobilenumbers().get(0) + "', ");
+            if (updatePersonRequest.getPersonNames() != null)
+                sb.append("name" + "='" + updatePersonRequest.getPersonNames() + "', ");
+            if (updatePersonRequest.getPersonSurnames() != null)
+                sb.append("surname" + "='" + updatePersonRequest.getPersonSurnames() + "', ");
+            if (updatePersonRequest.getPersonMobilenumbers() != null)
+                sb.append("mobilenumber" + "='" + updatePersonRequest.getPersonMobilenumbers() + "', ");
             sb.deleteCharAt(sb.lastIndexOf(","));
             sb.append("where ");
-            if (!findPersonRequest.getPersonIds().isEmpty()) {
-                sb.append("person_id ");
-                if (findPersonRequest.getPersonIds().size() > 1) {
-                    sb.append("in (");
-                    for (UUID person_id : findPersonRequest.getPersonIds()) {
-                        sb.append("'" + person_id + "', ");
-                    }
-                    sb.deleteCharAt(sb.lastIndexOf(","));
-                    sb.append(") AND ");
-                } else {
-                    sb.append("='" + findPersonRequest.getPersonIds().get(0) + "' AND ");
-                }
-            }
-            if (!findPersonRequest.getPersonNames().isEmpty()) {
-                sb.append("name ");
-                if (findPersonRequest.getPersonNames().size() > 1) {
-                    sb.append("in (");
-                    for (String name : findPersonRequest.getPersonNames()) {
-                        sb.append("'" + name + "', ");
-                    }
-                    sb.deleteCharAt(sb.lastIndexOf(","));
-                    sb.append(") AND ");
-                } else {
-                    sb.append("='" + findPersonRequest.getPersonNames().get(0) + "' AND ");
-                }
-            }
-            if (!findPersonRequest.getPersonSurnames().isEmpty()) {
-                sb.append("surname ");
-                if (findPersonRequest.getPersonSurnames().size() > 1) {
-                    sb.append("in (");
-                    for (String surname : findPersonRequest.getPersonSurnames()) {
-                        sb.append("'" + surname + "', ");
-                    }
-                    sb.deleteCharAt(sb.lastIndexOf(","));
-                    sb.append(") AND ");
-                } else {
-                    sb.append("='" + findPersonRequest.getPersonSurnames().get(0) + "' AND ");
-                }
-            }
-            if (!findPersonRequest.getPersonMobilenumbers().isEmpty()) {
-                sb.append("mobilenumber ");
-                if (findPersonRequest.getPersonMobilenumbers().size() > 1) {
-                    sb.append("in (");
-                    for (String mobilenumber : findPersonRequest.getPersonMobilenumbers()) {
-                        sb.append("'" + mobilenumber + "', ");
-                    }
-                    sb.deleteCharAt(sb.lastIndexOf(","));
-                    sb.append(") AND ");
-                } else {
-                    sb.append("='" + findPersonRequest.getPersonMobilenumbers().get(0) + "' AND ");
-                }
-            }
-            sb.delete(sb.length() - 4, sb.length());
-            sb.append(";");
+            sb.append(findPersonRequest.toSQLStatement());
             System.out.println(sb.toString());
             statement = connection.createStatement();
             statement.executeUpdate(sb.toString());
@@ -344,7 +182,7 @@ public class PersonDAO {
     }
 
     public Person updatePerson(Connection connection, Person person, FindPersonRequest findPersonRequest) {
-        FindPersonRequest updatePersonRequest = new FindPersonRequest();
+        UpdatePersonRequest updatePersonRequest = new UpdatePersonRequest();
         updatePersonRequest.setPersonId(person.getPersonId()).setPersonName(person.getName()).setPersonSurname(person.getSurname()).setPersonMobileNumber(person.getMobilenumber());
         update(connection, updatePersonRequest, findPersonRequest);
         return person;
@@ -355,60 +193,7 @@ public class PersonDAO {
         try {
             StringBuilder sb = new StringBuilder();
             sb.append("delete from person where ");
-            if (!findPersonRequest.getPersonIds().isEmpty()) {
-                sb.append("person_id ");
-                if (findPersonRequest.getPersonIds().size() > 1) {
-                    sb.append("in (");
-                    for (UUID person_id : findPersonRequest.getPersonIds()) {
-                        sb.append("'" + person_id + "', ");
-                    }
-                    sb.deleteCharAt(sb.lastIndexOf(","));
-                    sb.append(") AND ");
-                } else {
-                    sb.append("='" + findPersonRequest.getPersonIds().get(0) + "' AND ");
-                }
-            }
-            if (!findPersonRequest.getPersonNames().isEmpty()) {
-                sb.append("name ");
-                if (findPersonRequest.getPersonNames().size() > 1) {
-                    sb.append("in (");
-                    for (String name : findPersonRequest.getPersonNames()) {
-                        sb.append("'" + name + "', ");
-                    }
-                    sb.deleteCharAt(sb.lastIndexOf(","));
-                    sb.append(") AND ");
-                } else {
-                    sb.append("='" + findPersonRequest.getPersonNames().get(0) + "' AND ");
-                }
-            }
-            if (!findPersonRequest.getPersonSurnames().isEmpty()) {
-                sb.append("surname ");
-                if (findPersonRequest.getPersonSurnames().size() > 1) {
-                    sb.append("in (");
-                    for (String surname : findPersonRequest.getPersonSurnames()) {
-                        sb.append("'" + surname + "', ");
-                    }
-                    sb.deleteCharAt(sb.lastIndexOf(","));
-                    sb.append(") AND ");
-                } else {
-                    sb.append("='" + findPersonRequest.getPersonSurnames().get(0) + "' AND ");
-                }
-            }
-            if (!findPersonRequest.getPersonMobilenumbers().isEmpty()) {
-                sb.append("mobilenumber ");
-                if (findPersonRequest.getPersonMobilenumbers().size() > 1) {
-                    sb.append("in (");
-                    for (String mobilenumber : findPersonRequest.getPersonMobilenumbers()) {
-                        sb.append("'" + mobilenumber + "', ");
-                    }
-                    sb.deleteCharAt(sb.lastIndexOf(","));
-                    sb.append(") AND ");
-                } else {
-                    sb.append("='" + findPersonRequest.getPersonMobilenumbers().get(0) + "' AND ");
-                }
-            }
-            sb.delete(sb.length() - 4, sb.length());
-            sb.append(";");
+            sb.append(findPersonRequest.toSQLStatement());
             System.out.println(sb.toString());
             statement = connection.createStatement();
             statement.executeUpdate(sb.toString());

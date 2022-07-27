@@ -1,6 +1,7 @@
 package controler.DAOs;
 
 import controler.FindRequests.FindCartRequest;
+import controler.UpdateRequests.UpdateCartRequest;
 import model.Cart;
 
 import java.sql.Connection;
@@ -93,7 +94,7 @@ public class CartDAO {
         return cart;
     }
 
-    public void update(Connection connection, FindCartRequest updateCartRequest, FindCartRequest findCartRequest) {
+    public void update(Connection connection, UpdateCartRequest updateCartRequest, FindCartRequest findCartRequest) {
         Statement statement;
         try {
             StringBuilder sb = new StringBuilder();
@@ -131,29 +132,9 @@ public class CartDAO {
     }
 
     public void updateCart(Connection connection, Cart cart, FindCartRequest findCartRequest) {
-        Statement statement;
-        try {
-            StringBuilder sb = new StringBuilder();
-            sb.append("update cart set cart_id='" + cart.getCart_id() + "', person_id='" + cart.getPerson_id() + "', cart_name='" + cart.getCartname() + "' ");
-            sb.append("where ");
-            if (findCartRequest.getCartId() != null) {
-                sb.append("cart_id='" + findCartRequest.getCartId() + "' AND ");
-            }
-            if (findCartRequest.getPersonId() != null) {
-                sb.append("person_id='" + findCartRequest.getPersonId() + "' AND ");
-            }
-            if (findCartRequest.getCartname() != null) {
-                sb.append("cart_name='" + findCartRequest.getCartname() + "' AND ");
-            }
-            sb.delete(sb.length() - 4, sb.length());
-            sb.append(";");
-            System.out.println(sb.toString());
-            statement = connection.createStatement();
-            statement.executeUpdate(sb.toString());
-            System.out.println("Data updated");
-        } catch (Exception e) {
-            System.out.println(e);
-        }
+        UpdateCartRequest updateCartRequest=new UpdateCartRequest();
+        updateCartRequest.setCartCartId(cart.getCart_id()).setCartPersonId(cart.getPerson_id()).setCartCartname(cart.getCartname());
+        update(connection, updateCartRequest,findCartRequest);
     }
 
     public void delete(Connection connection, FindCartRequest findCartRequest) {

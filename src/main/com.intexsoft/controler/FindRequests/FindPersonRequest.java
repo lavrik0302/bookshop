@@ -54,4 +54,62 @@ public class FindPersonRequest {
         getPersonMobilenumbers().addAll(person_mobilenumbers);
         return this;
     }
+    public String toSQLStatement(){
+        StringBuilder sb=new StringBuilder();
+        if (!getPersonIds().isEmpty()) {
+            sb.append("person_id ");
+            if (getPersonIds().size() > 1) {
+                sb.append("in (");
+                for (UUID person_id : getPersonIds()) {
+                    sb.append("'" + person_id + "', ");
+                }
+                sb.deleteCharAt(sb.lastIndexOf(","));
+                sb.append(") AND ");
+            } else {
+                sb.append("='" + getPersonIds().get(0) + "' AND ");
+            }
+        }
+        if (!getPersonNames().isEmpty()) {
+            sb.append("name ");
+            if (getPersonNames().size() > 1) {
+                sb.append("in (");
+                for (String name : getPersonNames()) {
+                    sb.append("'" + name + "', ");
+                }
+                sb.deleteCharAt(sb.lastIndexOf(","));
+                sb.append(") AND ");
+            } else {
+                sb.append("='" + getPersonNames().get(0) + "' AND ");
+            }
+        }
+        if (!getPersonSurnames().isEmpty()) {
+            sb.append("surname ");
+            if (getPersonSurnames().size() > 1) {
+                sb.append("in (");
+                for (String surname : getPersonSurnames()) {
+                    sb.append("'" + surname + "', ");
+                }
+                sb.deleteCharAt(sb.lastIndexOf(","));
+                sb.append(") AND ");
+            } else {
+                sb.append("='" + getPersonSurnames().get(0) + "' AND ");
+            }
+        }
+        if (!getPersonMobilenumbers().isEmpty()) {
+            sb.append("mobilenumber ");
+            if (getPersonMobilenumbers().size() > 1) {
+                sb.append("in (");
+                for (String mobilenumber :getPersonMobilenumbers()) {
+                    sb.append("'" + mobilenumber + "', ");
+                }
+                sb.deleteCharAt(sb.lastIndexOf(","));
+                sb.append(") AND ");
+            } else {
+                sb.append("='" + getPersonMobilenumbers().get(0) + "' AND ");
+            }
+        }
+        sb.delete(sb.length() - 4, sb.length());
+        sb.append(";");
+        return sb.toString();
+    }
 }
