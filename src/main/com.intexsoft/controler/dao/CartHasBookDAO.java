@@ -1,7 +1,7 @@
-package controler.DAOs;
+package controler.dao;
 
-import controler.FindRequests.FindCartHasBookRequest;
-import controler.UpdateRequests.UpdateCartHasBookRequest;
+import controler.findRequests.FindCartHasBookRequest;
+import controler.updateRequests.UpdateCartHasBookRequest;
 import model.CartHasBook;
 
 import java.sql.Connection;

@@ -1,11 +1,9 @@
-package controler.DAOs;
+package controler.dao;
 
-import controler.FindRequests.FindCartRequest;
-import controler.FindRequests.FindPersonRequest;
-import controler.UpdateRequests.UpdateCartRequest;
+import controler.findRequests.FindCartRequest;
+import controler.updateRequests.UpdateCartRequest;
 import model.Cart;
 import model.CartHasBook;
-import model.Person;
 
 import java.sql.Connection;
 import java.sql.ResultSet;

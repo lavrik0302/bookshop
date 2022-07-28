@@ -1,7 +1,7 @@
-package controler.DAOs;
+package controler.dao;
 
-import controler.FindRequests.FindPersonRequest;
-import controler.UpdateRequests.UpdatePersonRequest;
+import controler.findRequests.FindPersonRequest;
+import controler.updateRequests.UpdatePersonRequest;
 import model.Cart;
 import model.Person;
 

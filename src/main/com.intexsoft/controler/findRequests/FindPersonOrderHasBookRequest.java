@@ -1,60 +1,59 @@
-package controler.FindRequests;
+package controler.findRequests;
 
 import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
 @Data
-public class FindCartHasBookRequest {
-    private List<UUID> cartIds = new ArrayList<>();
+public class FindPersonOrderHasBookRequest {
+    private List<UUID> orderIds = new ArrayList<>();
     private List<UUID> bookIds = new ArrayList<>();
     private List<Integer> bookCounts=new ArrayList<>();
 
-    public FindCartHasBookRequest setCartId(UUID cartId) {
-        cartIds.add(cartId);
+    public FindPersonOrderHasBookRequest setOrderId(UUID cartId) {
+        orderIds.add(cartId);
         return this;
     }
 
-    public FindCartHasBookRequest setCartId(List<UUID> cartId) {
-        cartIds.addAll(cartId);
+    public FindPersonOrderHasBookRequest setOrderId(List<UUID> cartId) {
+        orderIds.addAll(cartId);
         return this;
     }
 
-    public FindCartHasBookRequest setBookId(UUID bookId) {
+    public FindPersonOrderHasBookRequest setBookId(UUID bookId) {
         bookIds.add(bookId);
         return this;
     }
 
-    public FindCartHasBookRequest setBookId(List<UUID> bookId) {
+    public FindPersonOrderHasBookRequest setBookId(List<UUID> bookId) {
         bookIds.addAll(bookId);
         return this;
     }
 
-    public FindCartHasBookRequest setBookCount(Integer bookCount) {
+    public FindPersonOrderHasBookRequest setBookCount(Integer bookCount) {
         bookCounts.add(bookCount);
         return this;
     }
 
-    public FindCartHasBookRequest setBookCount(List<Integer> bookCount) {
+    public FindPersonOrderHasBookRequest setBookCount(List<Integer> bookCount) {
         bookCounts.addAll(bookCount);
         return this;
     }
 
     public String toSQLStringStatement() {
         StringBuilder sb = new StringBuilder();
-        if (!getCartIds().isEmpty()) {
-            sb.append("cart_id ");
-            if (getCartIds().size() > 1) {
+        if (!getOrderIds().isEmpty()) {
+            sb.append("order_id ");
+            if (getOrderIds().size() > 1) {
                 sb.append("in (");
-                for (UUID cart_id : getCartIds()) {
+                for (UUID cart_id : getOrderIds()) {
                     sb.append("'" + cart_id + "', ");
                 }
                 sb.deleteCharAt(sb.lastIndexOf(","));
                 sb.append(") AND ");
             } else {
-                sb.append("='" + getCartIds().get(0) + "' AND ");
+                sb.append("='" + getOrderIds().get(0) + "' AND ");
             }
         }
         if (!getBookIds().isEmpty()) {

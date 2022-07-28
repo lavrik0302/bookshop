@@ -1,11 +1,9 @@
 import controler.*;
-import controler.DAOs.*;
-import controler.FindRequests.*;
-import controler.UpdateRequests.*;
+import controler.dao.*;
+import controler.findRequests.*;
 import model.*;
 
 import java.sql.Connection;
-import java.util.UUID;
 
 public class Main {
     public static void main(String[] args) {

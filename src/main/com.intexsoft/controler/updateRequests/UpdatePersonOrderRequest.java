@@ -1,6 +1,5 @@
-package controler.UpdateRequests;
+package controler.updateRequests;
 
-import controler.FindRequests.FindPersonOrderRequest;
 import lombok.Data;
 
 import java.util.UUID;

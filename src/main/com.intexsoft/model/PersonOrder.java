@@ -14,5 +14,24 @@ public class PersonOrder {
     private UUID personId;
     private String adress;
     private Integer statusId;
-    private List<PersonOrderHasBook> orderHasBooks=new ArrayList<>();
+    private List<PersonOrderHasBook> orderHasBooks = new ArrayList<>();
+
+    public String getStringStatusId() {
+        switch (statusId) {
+            case 1:
+                return "availability check";
+            case 2:
+                return "waiting for payment";
+            case 3:
+                return "paid";
+            case 4:
+                return "at the post office";
+            case 5:
+                return "in way";
+            case 6:
+                return "delivered";
+            default:
+                return "incorrect statusId";
+        }
+    }
 }

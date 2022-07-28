@@ -1,7 +1,7 @@
-package controler.DAOs;
+package controler.dao;
 
-import controler.FindRequests.FindBookRequest;
-import controler.UpdateRequests.UpdateBookRequest;
+import controler.findRequests.FindBookRequest;
+import controler.updateRequests.UpdateBookRequest;
 import model.Book;
 
 import java.sql.Connection;

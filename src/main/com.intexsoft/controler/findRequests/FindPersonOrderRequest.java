@@ -1,4 +1,4 @@
-package controler.FindRequests;
+package controler.findRequests;
 
 import lombok.Data;
 

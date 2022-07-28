@@ -1,12 +1,8 @@
-package controler.DAOs;
+package controler.dao;
 
-import controler.FindRequests.FindCartRequest;
-import controler.FindRequests.FindPersonOrderRequest;
+import controler.findRequests.FindPersonOrderRequest;
 
-import controler.UpdateRequests.UpdateCartRequest;
-import controler.UpdateRequests.UpdatePersonOrderRequest;
-import model.Cart;
-import model.CartHasBook;
+import controler.updateRequests.UpdatePersonOrderRequest;
 import model.PersonOrder;
 import model.PersonOrderHasBook;
 
