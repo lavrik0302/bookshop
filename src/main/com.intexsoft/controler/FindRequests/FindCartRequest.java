@@ -24,4 +24,22 @@ public class FindCartRequest {
         setCartname(cartname);
         return this;
     }
+    public String toSQLStringStatement(){
+        StringBuilder sb =new StringBuilder();
+        if (getCartId() != null) {
+            sb.append("cart_id ");
+            sb.append("='" + getCartId() + "' AND ");
+        }
+        if (getPersonId() != null) {
+            sb.append("person_id ");
+            sb.append("='" + getPersonId() + "' AND ");
+        }
+        if (getCartname() != null) {
+            sb.append("cart_name ");
+            sb.append("='" + getCartname() + "' AND ");
+        }
+        sb.delete(sb.length() - 4, sb.length());
+        sb.append(";");
+        return sb.toString();
+    }
 }

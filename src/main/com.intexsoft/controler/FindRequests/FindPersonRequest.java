@@ -54,7 +54,7 @@ public class FindPersonRequest {
         getPersonMobilenumbers().addAll(person_mobilenumbers);
         return this;
     }
-    public String toSQLStatement(){
+    public String toSQLStringStatement() {
         StringBuilder sb=new StringBuilder();
         if (!getPersonIds().isEmpty()) {
             sb.append("person_id ");

@@ -74,7 +74,7 @@ public class PersonDAO {
         Statement statement;
         ResultSet rs = null;
         try {
-            String query = "select person.person_id, person.name, person.surname, person.mobilenumber, cart.cart_id, cart.cart_name from person left join cart on person.person_id=cart.person_id;";
+            String query = "select p.person_id, p.name, p.surname, p.mobilenumber, c.cart_id, c.cart_name from person AS p left join cart AS c on p.person_id=c.person_id;";
             statement = connection.createStatement();
             rs = statement.executeQuery(query);
             System.out.println(query);
@@ -85,8 +85,8 @@ public class PersonDAO {
                 person.setSurname(rs.getString(3));
                 person.setMobilenumber(rs.getString(4));
                 Cart cart = new Cart();
-                cart.setCart_id(rs.getObject(5, UUID.class));
-                cart.setPerson_id(rs.getObject(1, UUID.class));
+                cart.setCartId(rs.getObject(5, UUID.class));
+                cart.setPersonId(rs.getObject(1, UUID.class));
                 cart.setCartname(rs.getString(6));
                 person.setPersonCart(cart);
                 list.add(person);
@@ -104,7 +104,7 @@ public class PersonDAO {
         try {
             StringBuilder sb = new StringBuilder();
             sb.append("select * from person where ");
-            sb.append(findPersonRequest.toSQLStatement());
+            sb.append(findPersonRequest.toSQLStringStatement());
             System.out.println(sb.toString());
             statement = connection.createStatement();
             rs = statement.executeQuery(sb.toString());
@@ -128,8 +128,8 @@ public class PersonDAO {
         ResultSet rs = null;
         try {
             StringBuilder sb = new StringBuilder();
-            sb.append("select person.person_id, person.name, person.surname, person.mobilenumber, cart.cart_id, cart.cart_name from person left join cart on person.person_id=cart.person_id where ");
-            sb.append(findPersonRequest.toSQLStatement());
+            sb.append("select p.person_id, p.name, p.surname, p.mobilenumber, c.cart_id, c.cart_name from person AS p left join cart AS c on p.person_id=c.person_id where ");
+            sb.append(findPersonRequest.toSQLStringStatement());
             System.out.println(sb.toString());
             statement = connection.createStatement();
             rs = statement.executeQuery(sb.toString());
@@ -140,8 +140,8 @@ public class PersonDAO {
                 person.setSurname(rs.getString(3));
                 person.setMobilenumber(rs.getString(4));
                 Cart cart = new Cart();
-                cart.setCart_id(rs.getObject(5, UUID.class));
-                cart.setPerson_id(rs.getObject(1, UUID.class));
+                cart.setCartId(rs.getObject(5, UUID.class));
+                cart.setPersonId(rs.getObject(1, UUID.class));
                 cart.setCartname(rs.getString(6));
                 person.setPersonCart(cart);
                 list.add(person);
@@ -171,7 +171,7 @@ public class PersonDAO {
                 sb.append("mobilenumber" + "='" + updatePersonRequest.getPersonMobilenumbers() + "', ");
             sb.deleteCharAt(sb.lastIndexOf(","));
             sb.append("where ");
-            sb.append(findPersonRequest.toSQLStatement());
+            sb.append(findPersonRequest.toSQLStringStatement());
             System.out.println(sb.toString());
             statement = connection.createStatement();
             statement.executeUpdate(sb.toString());
@@ -193,7 +193,7 @@ public class PersonDAO {
         try {
             StringBuilder sb = new StringBuilder();
             sb.append("delete from person where ");
-            sb.append(findPersonRequest.toSQLStatement());
+            sb.append(findPersonRequest.toSQLStringStatement());
             System.out.println(sb.toString());
             statement = connection.createStatement();
             statement.executeUpdate(sb.toString());
