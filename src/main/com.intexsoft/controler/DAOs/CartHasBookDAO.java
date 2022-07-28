@@ -1,11 +1,7 @@
 package controler.DAOs;
 
 import controler.FindRequests.FindCartHasBookRequest;
-import controler.FindRequests.FindCartRequest;
 import controler.UpdateRequests.UpdateCartHasBookRequest;
-import controler.UpdateRequests.UpdateCartRequest;
-import model.Book;
-import model.Cart;
 import model.CartHasBook;
 
 import java.sql.Connection;
@@ -89,7 +85,7 @@ public class CartHasBookDAO {
         }
         return list;
     }
-    public void update(Connection connection, UpdateCartHasBookRequest updateCartHasBookRequest, FindCartHasBookRequest findCartHasBookRequestRequest) {
+    public void update(Connection connection, UpdateCartHasBookRequest updateCartHasBookRequest, FindCartHasBookRequest findCartHasBookRequest) {
         Statement statement;
         try {
             StringBuilder sb = new StringBuilder();
@@ -103,7 +99,7 @@ public class CartHasBookDAO {
                 sb.append("book_count" + "='" + updateCartHasBookRequest.getBookCounts() + "', ");
             sb.deleteCharAt(sb.lastIndexOf(","));
             sb.append("where ");
-            sb.append(findCartHasBookRequestRequest.toSQLStringStatement());
+            sb.append(findCartHasBookRequest.toSQLStringStatement());
             System.out.println(sb.toString());
             statement = connection.createStatement();
             statement.executeUpdate(sb.toString());

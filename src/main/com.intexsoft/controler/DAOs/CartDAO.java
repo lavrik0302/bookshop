@@ -1,8 +1,11 @@
 package controler.DAOs;
 
 import controler.FindRequests.FindCartRequest;
+import controler.FindRequests.FindPersonRequest;
 import controler.UpdateRequests.UpdateCartRequest;
 import model.Cart;
+import model.CartHasBook;
+import model.Person;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -82,6 +85,46 @@ public class CartDAO {
                 cart.setCartId(rs.getObject(1, UUID.class));
                 cart.setPersonId(rs.getObject(2, UUID.class));
                 cart.setCartname(rs.getString(3));
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return cart;
+    }
+    public Cart findWithBooks(Connection connection, FindCartRequest findCartRequest) {
+        Statement statement;
+        Cart cart=new Cart();
+        ResultSet rs = null;
+        try {
+            StringBuilder sb = new StringBuilder();
+            sb.append("select c.cart_id, c.person_id, c.cart_name, chs.book_id, chs.book_count from cart AS c left join cart_has_book AS chs on c.cart_id=chs.cart_id where ");
+            if (findCartRequest.getCartId() != null) {
+                sb.append("c.cart_id ");
+                sb.append("='" + findCartRequest.getCartId() + "' AND ");
+            }
+            if (findCartRequest.getPersonId() != null) {
+                sb.append("c.person_id ");
+                sb.append("='" + findCartRequest.getPersonId() + "' AND ");
+            }
+            if (findCartRequest.getCartname() != null) {
+                sb.append("c.cart_name ");
+                sb.append("='" + findCartRequest.getCartname() + "' AND ");
+            }
+            sb.delete(sb.length() - 4, sb.length());
+            sb.append(";");
+            System.out.println(sb.toString());
+            statement = connection.createStatement();
+            rs = statement.executeQuery(sb.toString());
+
+            while (rs.next()) {
+                cart.setCartId(rs.getObject(1, UUID.class));
+                cart.setPersonId(rs.getObject(2,UUID.class));
+                cart.setCartname(rs.getString(3));
+                CartHasBook cartHasBook=new CartHasBook();
+                cartHasBook.setCartId(rs.getObject(1,UUID.class));
+                cartHasBook.setBookId(rs.getObject(4, UUID.class));
+                cartHasBook.setBookCount(rs.getInt(5));
+                cart.getCartHasBooks().add(cartHasBook);
             }
         } catch (Exception e) {
             System.out.println(e);
