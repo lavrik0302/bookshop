@@ -1,16 +1,23 @@
+import controler.*;
+import controler.dao.*;
+import controler.findRequest.*;
+import controler.findRequest.fromTo.BookFromToCostInByns;
+import controler.findRequest.fromTo.BookFromToCountInStocks;
+
+
 import java.sql.Connection;
+import java.util.UUID;
 
 public class Main {
     public static void main(String[] args) {
-        DbFunctions dbFunctions = new DbFunctions();
+        ConnectToDb dbFunctions = new ConnectToDb();
         Connection connection = dbFunctions.connect_to_db("bookshop", "postgres", "postgrespw");
-        //dbFunctions.createTable(connection, "person");
-        //dbFunctions.insert_row(connection, "person", "John", "Doe", "+375292675618");
-        //dbFunctions.update_name(connection, "person", "Alexey", "Alex");
-        //dbFunctions.search_by_name(connection, "person", "Joseph");
+        BookDAO bookDAO = new BookDAO(connection);
+        PersonDAO personDAO = new PersonDAO(connection);
+        CartDAO cartDAO = new CartDAO(connection);
+        PersonOrderHasBookDAO personOrderHasBook = new PersonOrderHasBookDAO(connection);
+        PersonOrderDAO personOrderDAO = new PersonOrderDAO(connection);
+        PersonOrderHasBookDAO personOrderHasBookDAO = new PersonOrderHasBookDAO(connection);
 
-        dbFunctions.read_data(connection, "person");
-        dbFunctions.delete_table(connection,"person");
-        dbFunctions.read_data(connection, "person");
     }
 }
