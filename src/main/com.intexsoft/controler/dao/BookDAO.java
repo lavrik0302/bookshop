@@ -1,19 +1,20 @@
 package controler.dao;
 
-import controler.findRequests.FindBookRequest;
-import controler.updateRequests.UpdateBookRequest;
+import controler.findRequest.FindBookRequest;
+import controler.findRequest.toStringSqlStatement.ToSqlStringStatementForBook;
+import controler.updateRequest.UpdateBookRequest;
 import model.Book;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public class BookDAO {
-    public Book createRow(Connection connection, String bookname, String author, int costInByn, int countInStock) {
-        Statement statement;
+    Connection connection;
+
+    public Book createRow(String bookname, String author, int costInByn, int countInStock) {
+        PreparedStatement preparedStatement;
         Book book = new Book();
         try {
             UUID uuid = UUID.randomUUID();
@@ -22,9 +23,14 @@ public class BookDAO {
             book.setAuthor(author);
             book.setCostInByn(costInByn);
             book.setCountInStock(countInStock);
-            String query = "insert into book values ('" + uuid + "', '" + bookname + "', '" + author + "', " + costInByn + ", " + countInStock + ");";
-            statement = connection.createStatement();
-            statement.executeUpdate(query);
+            preparedStatement = connection.prepareStatement("insert into book values (?, ?, ?, ?, ?)");
+            preparedStatement.setObject(1, uuid);
+            preparedStatement.setString(2, bookname);
+            preparedStatement.setString(3, author);
+            preparedStatement.setInt(4, costInByn);
+            preparedStatement.setInt(5, countInStock);
+            preparedStatement.executeUpdate();
+
             System.out.println("Insert success");
         } catch (Exception e) {
             System.out.println(e);
@@ -32,12 +38,16 @@ public class BookDAO {
         return book;
     }
 
-    public Book createBook(Connection connection, Book book) {
-        Statement statement;
+    public Book createBook(Book book) {
+        PreparedStatement preparedStatement;
         try {
-            String query = "insert into book values ('" + book.getBookId() + "', '" + book.getBookname() + "', '" + book.getAuthor() + "', " + book.getCostInByn() + ", " + book.getCountInStock() + ");";
-            statement = connection.createStatement();
-            statement.executeUpdate(query);
+            preparedStatement = connection.prepareStatement("insert into book values (?, ?, ?, ?, ?)");
+            preparedStatement.setObject(1, book.getBookId());
+            preparedStatement.setString(2, book.getBookname());
+            preparedStatement.setString(3, book.getAuthor());
+            preparedStatement.setInt(4, book.getCostInByn());
+            preparedStatement.setInt(5, book.getCountInStock());
+            preparedStatement.executeUpdate();
             System.out.println("Insert success");
         } catch (Exception e) {
             System.out.println(e);
@@ -45,7 +55,7 @@ public class BookDAO {
         return book;
     }
 
-    public List<Book> readAll(Connection connection) {
+    public List<Book> findAll() {
         List<Book> list = new ArrayList<>();
         Statement statement;
         ResultSet rs = null;
@@ -55,11 +65,11 @@ public class BookDAO {
             rs = statement.executeQuery(query);
             while (rs.next()) {
                 Book book = new Book();
-                book.setBookId(rs.getObject(1, UUID.class));
-                book.setBookname(rs.getString(2));
-                book.setAuthor(rs.getString(3));
-                book.setCostInByn(rs.getInt(4));
-                book.setCountInStock(rs.getInt(5));
+                book.setBookId(rs.getObject("book_id", UUID.class));
+                book.setBookname(rs.getString("bookname"));
+                book.setAuthor(rs.getString("author"));
+                book.setCostInByn(rs.getInt("cost_in_byn"));
+                book.setCountInStock(rs.getInt("count_in_stock"));
                 list.add(book);
             }
         } catch (Exception e) {
@@ -68,24 +78,25 @@ public class BookDAO {
         return list;
     }
 
-    public List<Book> find(Connection connection, FindBookRequest findBookRequest) {
+    public List<Book> find(FindBookRequest findBookRequest) {
         Statement statement;
         List<Book> list = new ArrayList<>();
         ResultSet rs = null;
         try {
             StringBuilder sb = new StringBuilder();
             sb.append("select * from book where ");
-            sb.append(findBookRequest.toSQLStringStatement());
+            ToSqlStringStatementForBook toSqlStringStatementForBook = new ToSqlStringStatementForBook();
+            sb.append(toSqlStringStatementForBook.toSQLStringStatement(findBookRequest));
             System.out.println(sb.toString());
             statement = connection.createStatement();
             rs = statement.executeQuery(sb.toString());
             while (rs.next()) {
                 Book book = new Book();
-                book.setBookId(rs.getObject(1, UUID.class));
-                book.setBookname(rs.getString(2));
-                book.setAuthor(rs.getString(3));
-                book.setCostInByn(rs.getInt(4));
-                book.setCountInStock(rs.getInt(5));
+                book.setBookId(rs.getObject("book_id", UUID.class));
+                book.setBookname(rs.getString("bookname"));
+                book.setAuthor(rs.getString("author"));
+                book.setCostInByn(rs.getInt("cost_in_byn"));
+                book.setCountInStock(rs.getInt("count_in_stock"));
                 list.add(book);
             }
         } catch (Exception e) {
@@ -94,26 +105,26 @@ public class BookDAO {
         return list;
     }
 
-
-    public void update(Connection connection, UpdateBookRequest updateBookRequest, FindBookRequest findBookRequest) {
+    public void update(UpdateBookRequest updateBookRequest, FindBookRequest findBookRequest) {
         Statement statement;
         try {
             StringBuilder sb = new StringBuilder();
             sb.append("update book set ");
 
             if (updateBookRequest.getBookIds() != null)
-                sb.append("book_id" + "='" + updateBookRequest.getBookIds() + "', ");
+                sb.append("book_id='").append(updateBookRequest.getBookIds()).append("', ");
             if (updateBookRequest.getBookBooknames() != null)
-                sb.append("bookname" + "='" + updateBookRequest.getBookBooknames() + "', ");
+                sb.append("bookname='").append(updateBookRequest.getBookBooknames()).append("', ");
             if (updateBookRequest.getBookAuthors() != null)
-                sb.append("author" + "='" + updateBookRequest.getBookAuthors() + "', ");
+                sb.append("author='").append(updateBookRequest.getBookAuthors()).append("', ");
             if (updateBookRequest.getBookCostInByns() != null)
-                sb.append("cost_in_byn" + "='" + updateBookRequest.getBookCostInByns() + "', ");
+                sb.append("cost_in_byn='").append(updateBookRequest.getBookCostInByns()).append("', ");
             if (updateBookRequest.getBookCountInStocks() != null)
-                sb.append("count_in_stock" + "='" + updateBookRequest.getBookCountInStocks() + "', ");
+                sb.append("count_in_stock='").append(updateBookRequest.getBookCountInStocks()).append("', ");
             sb.deleteCharAt(sb.lastIndexOf(","));
             sb.append("where ");
-            sb.append(findBookRequest.toSQLStringStatement());
+            ToSqlStringStatementForBook toSqlStringStatementForBook = new ToSqlStringStatementForBook();
+            sb.append(toSqlStringStatementForBook.toSQLStringStatement(findBookRequest));
             System.out.println(sb.toString());
             statement = connection.createStatement();
             statement.executeUpdate(sb.toString());
@@ -123,19 +134,21 @@ public class BookDAO {
         }
     }
 
-    public Book updateBook(Connection connection, Book book, FindBookRequest findBookRequest) {
+    public Book updateBook(Book book) {
+        FindBookRequest findBookRequest = new FindBookRequest().setBookId(book.getBookId());
         UpdateBookRequest updateBookRequest = new UpdateBookRequest();
         updateBookRequest.setBookId(book.getBookId()).setBookBookname(book.getBookname()).setBookAuthor(book.getAuthor()).setBookCostInByn(book.getCostInByn()).setBookCountInStock(book.getCountInStock());
-        update(connection, updateBookRequest, findBookRequest);
+        update(updateBookRequest, findBookRequest);
         return book;
     }
 
-    public void delete(Connection connection, FindBookRequest findBookRequest) {
+    public void delete(FindBookRequest findBookRequest) {
         Statement statement;
         try {
             StringBuilder sb = new StringBuilder();
             sb.append("delete from book where ");
-            sb.append(findBookRequest.toSQLStringStatement());
+            ToSqlStringStatementForBook toSqlStringStatementForBook = new ToSqlStringStatementForBook();
+            sb.append(toSqlStringStatementForBook.toSQLStringStatement(findBookRequest));
             System.out.println(sb.toString());
             statement = connection.createStatement();
             statement.executeUpdate(sb.toString());
@@ -143,5 +156,9 @@ public class BookDAO {
         } catch (Exception e) {
             System.out.println(e);
         }
+    }
+
+    public BookDAO(Connection connection) {
+        this.connection = connection;
     }
 }

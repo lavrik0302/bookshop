@@ -1,10 +1,12 @@
 package controler.dao;
 
-import controler.findRequests.FindPersonOrderHasBookRequest;
-import controler.updateRequests.UpdatePersonOrderHasBookRequest;
+import controler.findRequest.FindPersonOrderHasBookRequest;
+import controler.findRequest.toStringSqlStatement.ToSqlStringStatementForPersonOrderHasBook;
+import controler.updateRequest.UpdatePersonOrderHasBookRequest;
 import model.PersonOrderHasBook;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -12,35 +14,44 @@ import java.util.List;
 import java.util.UUID;
 
 public class PersonOrderHasBookDAO {
-    public PersonOrderHasBook createRow(Connection connection, UUID orderId, UUID bookId, int bookCount) {
-        Statement statement;
-        PersonOrderHasBook personOrderHasBook=new PersonOrderHasBook();
+    Connection connection;
+
+    public PersonOrderHasBook createRow(UUID orderId, UUID bookId, int bookCount) {
+        PreparedStatement preparedStatement;
+        PersonOrderHasBook personOrderHasBook = new PersonOrderHasBook();
         try {
             personOrderHasBook.setOrderId(orderId);
             personOrderHasBook.setBookId(bookId);
             personOrderHasBook.setBookCount(bookCount);
-            String query = "insert into person_order_has_book values ('" + orderId + "', '" + bookId + "', '" + bookCount + "');";
-            statement = connection.createStatement();
-            statement.executeUpdate(query);
+            preparedStatement=connection.prepareStatement("insert into person_order_has_book values (?, ?, ?)");
+            preparedStatement.setObject(1, orderId);
+            preparedStatement.setObject(2, bookId);
+            preparedStatement.setInt(3,bookCount);
+            preparedStatement.executeUpdate();
+
             System.out.println("Insert success");
         } catch (Exception e) {
             System.out.println(e);
         }
         return personOrderHasBook;
     }
-    public PersonOrderHasBook createPersonOrderHasBook(Connection connection, PersonOrderHasBook personOrderHasBook) {
-        Statement statement;
+
+    public PersonOrderHasBook createPersonOrderHasBook(PersonOrderHasBook personOrderHasBook) {
+        PreparedStatement preparedStatement;
         try {
-            String query = "insert into person_order_has_book values ('" + personOrderHasBook.getOrderId() + "', '" + personOrderHasBook.getBookId() + "', '" + personOrderHasBook.getBookCount() + "');";
-            statement = connection.createStatement();
-            statement.executeUpdate(query);
+            preparedStatement=connection.prepareStatement("insert into person_order_has_book values (?, ?, ?)");
+            preparedStatement.setObject(1, personOrderHasBook.getOrderId());
+            preparedStatement.setObject(2, personOrderHasBook.getBookId());
+            preparedStatement.setInt(3,personOrderHasBook.getBookCount());
+            preparedStatement.executeUpdate();
             System.out.println("Insert success");
         } catch (Exception e) {
             System.out.println(e);
         }
         return personOrderHasBook;
     }
-    public List<PersonOrderHasBook> readAll(Connection connection) {
+
+    public List<PersonOrderHasBook> findAll(Connection connection) {
         List<PersonOrderHasBook> list = new ArrayList<>();
         Statement statement;
         ResultSet rs = null;
@@ -49,10 +60,10 @@ public class PersonOrderHasBookDAO {
             statement = connection.createStatement();
             rs = statement.executeQuery(query);
             while (rs.next()) {
-                PersonOrderHasBook personOrderHasBook=new PersonOrderHasBook();
-                personOrderHasBook.setOrderId(rs.getObject(1, UUID.class));
-                personOrderHasBook.setBookId(rs.getObject(2, UUID.class));
-                personOrderHasBook.setBookCount(rs.getInt(3));
+                PersonOrderHasBook personOrderHasBook = new PersonOrderHasBook();
+                personOrderHasBook.setOrderId(rs.getObject("order_id", UUID.class));
+                personOrderHasBook.setBookId(rs.getObject("book_id", UUID.class));
+                personOrderHasBook.setBookCount(rs.getInt("book_count"));
                 list.add(personOrderHasBook);
             }
         } catch (Exception e) {
@@ -60,22 +71,24 @@ public class PersonOrderHasBookDAO {
         }
         return list;
     }
-    public List<PersonOrderHasBook> find(Connection connection, FindPersonOrderHasBookRequest findPersonOrderHasBookRequest) {
+
+    public List<PersonOrderHasBook> find(FindPersonOrderHasBookRequest findPersonOrderHasBookRequest) {
         Statement statement;
-        List<PersonOrderHasBook> list=new ArrayList<>();
+        List<PersonOrderHasBook> list = new ArrayList<>();
         ResultSet rs = null;
         try {
             StringBuilder sb = new StringBuilder();
             sb.append("select * from person_order_has_book where ");
-            sb.append(findPersonOrderHasBookRequest.toSQLStringStatement());
+            ToSqlStringStatementForPersonOrderHasBook toSqlStringStatementForPersonOrderHasBook = new ToSqlStringStatementForPersonOrderHasBook();
+            sb.append(toSqlStringStatementForPersonOrderHasBook.toSQLStringStatement(findPersonOrderHasBookRequest));
             System.out.println(sb.toString());
             statement = connection.createStatement();
             rs = statement.executeQuery(sb.toString());
             while (rs.next()) {
-                PersonOrderHasBook personOrderHasBook=new PersonOrderHasBook();
-                personOrderHasBook.setOrderId(rs.getObject(1,UUID.class));
-                personOrderHasBook.setBookId(rs.getObject(2, UUID.class));
-                personOrderHasBook.setBookCount(rs.getInt(3));
+                PersonOrderHasBook personOrderHasBook = new PersonOrderHasBook();
+                personOrderHasBook.setOrderId(rs.getObject("order_id", UUID.class));
+                personOrderHasBook.setBookId(rs.getObject("book_id", UUID.class));
+                personOrderHasBook.setBookCount(rs.getInt("book_count"));
                 list.add(personOrderHasBook);
             }
         } catch (Exception e) {
@@ -83,21 +96,23 @@ public class PersonOrderHasBookDAO {
         }
         return list;
     }
-    public void update(Connection connection, UpdatePersonOrderHasBookRequest updateCartHasBookRequest, FindPersonOrderHasBookRequest findPersonOrderHasBookRequest) {
+
+    public void update(UpdatePersonOrderHasBookRequest updateCartHasBookRequest, FindPersonOrderHasBookRequest findPersonOrderHasBookRequest) {
         Statement statement;
         try {
             StringBuilder sb = new StringBuilder();
             sb.append("update person_order_has_book set ");
 
             if (updateCartHasBookRequest.getOrderIds() != null)
-                sb.append("order_id" + "='" + updateCartHasBookRequest.getOrderIds() + "', ");
+                sb.append("order_id='").append(updateCartHasBookRequest.getOrderIds()).append("', ");
             if (updateCartHasBookRequest.getBookIds() != null)
-                sb.append("book_id" + "='" + updateCartHasBookRequest.getBookIds() + "', ");
+                sb.append("book_id='").append(updateCartHasBookRequest.getBookIds()).append("', ");
             if (updateCartHasBookRequest.getBookCounts() != null)
-                sb.append("book_count" + "='" + updateCartHasBookRequest.getBookCounts() + "', ");
+                sb.append("book_count='").append(updateCartHasBookRequest.getBookCounts()).append("', ");
             sb.deleteCharAt(sb.lastIndexOf(","));
             sb.append("where ");
-            sb.append(findPersonOrderHasBookRequest.toSQLStringStatement());
+            ToSqlStringStatementForPersonOrderHasBook toSqlStringStatementForPersonOrderHasBook = new ToSqlStringStatementForPersonOrderHasBook();
+            sb.append(toSqlStringStatementForPersonOrderHasBook.toSQLStringStatement(findPersonOrderHasBookRequest));
             System.out.println(sb.toString());
             statement = connection.createStatement();
             statement.executeUpdate(sb.toString());
@@ -106,19 +121,22 @@ public class PersonOrderHasBookDAO {
             System.out.println(e);
         }
     }
-    public PersonOrderHasBook updateCartHasBook(Connection connection, PersonOrderHasBook personOrderHasBook, FindPersonOrderHasBookRequest findPersonOrderHasBookRequest) {
-        UpdatePersonOrderHasBookRequest updatePersonOrderHasBookRequest=new UpdatePersonOrderHasBookRequest();
+
+    public PersonOrderHasBook updateCartHasBook(PersonOrderHasBook personOrderHasBook) {
+        FindPersonOrderHasBookRequest findPersonOrderHasBookRequest = new FindPersonOrderHasBookRequest().setOrderId(personOrderHasBook.getOrderId());
+        UpdatePersonOrderHasBookRequest updatePersonOrderHasBookRequest = new UpdatePersonOrderHasBookRequest();
         updatePersonOrderHasBookRequest.setOrderId(personOrderHasBook.getOrderId()).setBookId(personOrderHasBook.getBookId()).setBookCounts(personOrderHasBook.getBookCount());
-        update(connection, updatePersonOrderHasBookRequest, findPersonOrderHasBookRequest);
+        update(updatePersonOrderHasBookRequest, findPersonOrderHasBookRequest);
         return personOrderHasBook;
     }
 
-    public void delete(Connection connection, FindPersonOrderHasBookRequest findPersonOrderHasBookRequest) {
+    public void delete(FindPersonOrderHasBookRequest findPersonOrderHasBookRequest) {
         Statement statement;
         try {
             StringBuilder sb = new StringBuilder();
             sb.append("delete from person_order_has_book where ");
-            sb.append(findPersonOrderHasBookRequest.toSQLStringStatement());
+            ToSqlStringStatementForPersonOrderHasBook toSqlStringStatementForPersonOrderHasBook = new ToSqlStringStatementForPersonOrderHasBook();
+            sb.append(toSqlStringStatementForPersonOrderHasBook.toSQLStringStatement(findPersonOrderHasBookRequest));
             System.out.println(sb.toString());
             statement = connection.createStatement();
             statement.executeUpdate(sb.toString());
@@ -126,5 +144,9 @@ public class PersonOrderHasBookDAO {
         } catch (Exception e) {
             System.out.println(e);
         }
+    }
+
+    public PersonOrderHasBookDAO(Connection connection) {
+        this.connection = connection;
     }
 }

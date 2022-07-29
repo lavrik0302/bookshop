@@ -1,4 +1,4 @@
-package controler.updateRequests;
+package controler.updateRequest;
 
 import lombok.Data;
 

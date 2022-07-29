@@ -14,7 +14,7 @@ public class PersonOrder {
     private UUID personId;
     private String adress;
     private Integer statusId;
-    private List<PersonOrderHasBook> orderHasBooks = new ArrayList<>();
+    private List<Book> books = new ArrayList<>();
 
     public String getStringStatusId() {
         switch (statusId) {

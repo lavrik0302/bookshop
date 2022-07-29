@@ -1,10 +1,12 @@
 package controler.dao;
 
-import controler.findRequests.FindCartHasBookRequest;
-import controler.updateRequests.UpdateCartHasBookRequest;
+import controler.findRequest.FindCartHasBookRequest;
+import controler.findRequest.toStringSqlStatement.ToSqlStringStatementForCartHasBook;
+import controler.updateRequest.UpdateCartHasBookRequest;
 import model.CartHasBook;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -12,16 +14,20 @@ import java.util.List;
 import java.util.UUID;
 
 public class CartHasBookDAO {
-    public CartHasBook createRow(Connection connection, UUID cartId, UUID bookId, int bookCount) {
-        Statement statement;
+    Connection connection;
+
+    public CartHasBook createRow(UUID cartId, UUID bookId, int bookCount) {
+        PreparedStatement preparedStatement;
         CartHasBook cartHasBook = new CartHasBook();
         try {
             cartHasBook.setCartId(cartId);
             cartHasBook.setBookId(bookId);
             cartHasBook.setBookCount(bookCount);
-            String query = "insert into cart_has_book values ('" + cartId + "', '" + bookId + "', '" + bookCount + "');";
-            statement = connection.createStatement();
-            statement.executeUpdate(query);
+            preparedStatement = connection.prepareStatement("insert into cart_has_book values (?, ?, ?)");
+            preparedStatement.setObject(1, cartId);
+            preparedStatement.setObject(2, bookId);
+            preparedStatement.setObject(3, bookCount);
+            preparedStatement.executeUpdate();
             System.out.println("Insert success");
         } catch (Exception e) {
             System.out.println(e);
@@ -29,12 +35,14 @@ public class CartHasBookDAO {
         return cartHasBook;
     }
 
-    public CartHasBook createCartHasBook(Connection connection, CartHasBook cartHasBook) {
-        Statement statement;
+    public CartHasBook createCartHasBook(CartHasBook cartHasBook) {
+        PreparedStatement preparedStatement;
         try {
-            String query = "insert into cart_has_book values ('" + cartHasBook.getCartId() + "', '" + cartHasBook.getBookId() + "', '" + cartHasBook.getBookCount() + "');";
-            statement = connection.createStatement();
-            statement.executeUpdate(query);
+            preparedStatement = connection.prepareStatement("insert into cart_has_book values (?, ?, ?)");
+            preparedStatement.setObject(1, cartHasBook.getCartId());
+            preparedStatement.setObject(2, cartHasBook.getBookId());
+            preparedStatement.setObject(3, cartHasBook.getBookCount());
+            preparedStatement.executeUpdate();
             System.out.println("Insert success");
         } catch (Exception e) {
             System.out.println(e);
@@ -42,7 +50,7 @@ public class CartHasBookDAO {
         return cartHasBook;
     }
 
-    public List<CartHasBook> readAll(Connection connection) {
+    public List<CartHasBook> findAll() {
         List<CartHasBook> list = new ArrayList<>();
         Statement statement;
         ResultSet rs = null;
@@ -52,9 +60,9 @@ public class CartHasBookDAO {
             rs = statement.executeQuery(query);
             while (rs.next()) {
                 CartHasBook cartHasBook = new CartHasBook();
-                cartHasBook.setCartId(rs.getObject(1, UUID.class));
-                cartHasBook.setBookId(rs.getObject(2, UUID.class));
-                cartHasBook.setBookCount(rs.getInt(3));
+                cartHasBook.setCartId(rs.getObject("cart_id", UUID.class));
+                cartHasBook.setBookId(rs.getObject("book_id", UUID.class));
+                cartHasBook.setBookCount(rs.getInt("book_count"));
                 list.add(cartHasBook);
             }
         } catch (Exception e) {
@@ -62,22 +70,24 @@ public class CartHasBookDAO {
         }
         return list;
     }
-    public List<CartHasBook> find(Connection connection, FindCartHasBookRequest findCartHasBookRequest) {
+
+    public List<CartHasBook> find(FindCartHasBookRequest findCartHasBookRequest) {
         Statement statement;
-        List<CartHasBook> list=new ArrayList<>();
+        List<CartHasBook> list = new ArrayList<>();
         ResultSet rs = null;
         try {
             StringBuilder sb = new StringBuilder();
             sb.append("select * from cart_has_book where ");
-            sb.append(findCartHasBookRequest.toSQLStringStatement());
+            ToSqlStringStatementForCartHasBook toSqlStringStatementForCartHasBook = new ToSqlStringStatementForCartHasBook();
+            sb.append(toSqlStringStatementForCartHasBook.toSQLStringStatement(findCartHasBookRequest));
             System.out.println(sb.toString());
             statement = connection.createStatement();
             rs = statement.executeQuery(sb.toString());
             while (rs.next()) {
                 CartHasBook cartHasBook = new CartHasBook();
-                cartHasBook.setCartId(rs.getObject(1, UUID.class));
-                cartHasBook.setBookId(rs.getObject(2, UUID.class));
-                cartHasBook.setBookCount(rs.getInt(3));
+                cartHasBook.setCartId(rs.getObject("cart_id", UUID.class));
+                cartHasBook.setBookId(rs.getObject("book_id", UUID.class));
+                cartHasBook.setBookCount(rs.getInt("book_count"));
                 list.add(cartHasBook);
             }
         } catch (Exception e) {
@@ -85,21 +95,23 @@ public class CartHasBookDAO {
         }
         return list;
     }
-    public void update(Connection connection, UpdateCartHasBookRequest updateCartHasBookRequest, FindCartHasBookRequest findCartHasBookRequest) {
+
+    public void update(UpdateCartHasBookRequest updateCartHasBookRequest, FindCartHasBookRequest findCartHasBookRequest) {
         Statement statement;
         try {
             StringBuilder sb = new StringBuilder();
             sb.append("update cart_has_book set ");
 
             if (updateCartHasBookRequest.getCartIds() != null)
-                sb.append("cart_id" + "='" + updateCartHasBookRequest.getCartIds() + "', ");
+                sb.append("cart_id='").append(updateCartHasBookRequest.getCartIds()).append("', ");
             if (updateCartHasBookRequest.getBookIds() != null)
-                sb.append("book_id" + "='" + updateCartHasBookRequest.getBookIds() + "', ");
+                sb.append("book_id='").append(updateCartHasBookRequest.getBookIds()).append("', ");
             if (updateCartHasBookRequest.getBookCounts() != null)
-                sb.append("book_count" + "='" + updateCartHasBookRequest.getBookCounts() + "', ");
+                sb.append("book_count='").append(updateCartHasBookRequest.getBookCounts()).append("', ");
             sb.deleteCharAt(sb.lastIndexOf(","));
             sb.append("where ");
-            sb.append(findCartHasBookRequest.toSQLStringStatement());
+            ToSqlStringStatementForCartHasBook toSqlStringStatementForCartHasBook = new ToSqlStringStatementForCartHasBook();
+            sb.append(toSqlStringStatementForCartHasBook.toSQLStringStatement(findCartHasBookRequest));
             System.out.println(sb.toString());
             statement = connection.createStatement();
             statement.executeUpdate(sb.toString());
@@ -108,18 +120,22 @@ public class CartHasBookDAO {
             System.out.println(e);
         }
     }
-    public CartHasBook updateCartHasBook(Connection connection, CartHasBook cartHasBook, FindCartHasBookRequest findCartHasBookRequest) {
+
+    public CartHasBook updateCartHasBook(CartHasBook cartHasBook) {
+        FindCartHasBookRequest findCartHasBookRequest = new FindCartHasBookRequest().setCartId(cartHasBook.getCartId());
         UpdateCartHasBookRequest updateCartHasBookRequest = new UpdateCartHasBookRequest();
         updateCartHasBookRequest.setCartId(cartHasBook.getCartId()).setBookId(cartHasBook.getBookId()).setBookCounts(cartHasBook.getBookCount());
-        update(connection, updateCartHasBookRequest, findCartHasBookRequest);
+        update(updateCartHasBookRequest, findCartHasBookRequest);
         return cartHasBook;
     }
-    public void delete(Connection connection, FindCartHasBookRequest findCartHasBookRequest) {
+
+    public void delete(FindCartHasBookRequest findCartHasBookRequest) {
         Statement statement;
         try {
             StringBuilder sb = new StringBuilder();
             sb.append("delete from cart_has_book where ");
-            sb.append(findCartHasBookRequest.toSQLStringStatement());
+            ToSqlStringStatementForCartHasBook toSqlStringStatementForCartHasBook = new ToSqlStringStatementForCartHasBook();
+            sb.append(toSqlStringStatementForCartHasBook.toSQLStringStatement(findCartHasBookRequest));
             System.out.println(sb.toString());
             statement = connection.createStatement();
             statement.executeUpdate(sb.toString());
@@ -127,5 +143,9 @@ public class CartHasBookDAO {
         } catch (Exception e) {
             System.out.println(e);
         }
+    }
+
+    public CartHasBookDAO(Connection connection) {
+        this.connection = connection;
     }
 }

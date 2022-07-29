@@ -1,12 +1,15 @@
 package controler.dao;
 
-import controler.findRequests.FindPersonOrderRequest;
+import controler.findRequest.FindPersonOrderRequest;
 
-import controler.updateRequests.UpdatePersonOrderRequest;
+import controler.findRequest.toStringSqlStatement.ToSqlStringStatementForPersonOrder;
+import controler.updateRequest.UpdatePersonOrderRequest;
+import model.Book;
 import model.PersonOrder;
 import model.PersonOrderHasBook;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -14,8 +17,10 @@ import java.util.List;
 import java.util.UUID;
 
 public class PersonOrderDAO {
-    public PersonOrder createRow(Connection connection, UUID personId, String adress, int statusId) {
-        Statement statement;
+    Connection connection;
+
+    public PersonOrder createRow(UUID personId, String adress, int statusId) {
+        PreparedStatement preparedStatement;
         PersonOrder personOrder = new PersonOrder();
         try {
             UUID uuid = UUID.randomUUID();
@@ -23,9 +28,12 @@ public class PersonOrderDAO {
             personOrder.setPersonId(personId);
             personOrder.setAdress(adress);
             personOrder.setStatusId(statusId);
-            String query = "insert into person_order values ('" + uuid + "', '" + personId + "', '" + adress + "', '" + statusId + "');";
-            statement = connection.createStatement();
-            statement.executeUpdate(query);
+            preparedStatement=connection.prepareStatement("insert into person_order values(?, ?, ?, ?)");
+            preparedStatement.setObject(1, uuid);
+            preparedStatement.setObject(2, personId);
+            preparedStatement.setString(3, adress);
+            preparedStatement.setInt(4, statusId);
+            preparedStatement.executeUpdate();
             System.out.println("Insert success");
         } catch (Exception e) {
             System.out.println(e);
@@ -33,12 +41,15 @@ public class PersonOrderDAO {
         return personOrder;
     }
 
-    public PersonOrder createPersonOrder(Connection connection, PersonOrder personOrder) {
-        Statement statement;
+    public PersonOrder createPersonOrder(PersonOrder personOrder) {
+        PreparedStatement preparedStatement;
         try {
-            String query = "insert into person_order values ('" + personOrder.getOrderId() + "', '" + personOrder.getPersonId() + "', '" + personOrder.getAdress() + "', '" + personOrder.getStatusId() + "');";
-            statement = connection.createStatement();
-            statement.executeUpdate(query);
+            preparedStatement=connection.prepareStatement("insert into person_order values(?, ?, ?, ?)");
+            preparedStatement.setObject(1, personOrder.getOrderId());
+            preparedStatement.setObject(2, personOrder.getPersonId());
+            preparedStatement.setString(3, personOrder.getAdress());
+            preparedStatement.setInt(4, personOrder.getStatusId());
+            preparedStatement.executeUpdate();
             System.out.println("Insert success");
         } catch (Exception e) {
             System.out.println(e);
@@ -46,7 +57,7 @@ public class PersonOrderDAO {
         return personOrder;
     }
 
-    public List<PersonOrder> readAll(Connection connection) {
+    public List<PersonOrder> findAll() {
         List<PersonOrder> list = new ArrayList<>();
         Statement statement;
         ResultSet rs = null;
@@ -56,10 +67,10 @@ public class PersonOrderDAO {
             rs = statement.executeQuery(query);
             while (rs.next()) {
                 PersonOrder personOrder = new PersonOrder();
-                personOrder.setOrderId(rs.getObject(1, UUID.class));
-                personOrder.setPersonId(rs.getObject(2, UUID.class));
-                personOrder.setAdress(rs.getString(3));
-                personOrder.setStatusId(rs.getInt(4));
+                personOrder.setOrderId(rs.getObject("order_id", UUID.class));
+                personOrder.setPersonId(rs.getObject("person_id", UUID.class));
+                personOrder.setAdress(rs.getString("adress"));
+                personOrder.setStatusId(rs.getInt("status_id"));
                 list.add(personOrder);
             }
         } catch (Exception e) {
@@ -68,7 +79,7 @@ public class PersonOrderDAO {
         return list;
     }
 
-    public List<PersonOrder> find(Connection connection, FindPersonOrderRequest findPersonOrderRequest) {
+    public List<PersonOrder> find(FindPersonOrderRequest findPersonOrderRequest) {
         Statement statement;
         List<PersonOrder> list = new ArrayList<>();
         PersonOrder personOrder = new PersonOrder();
@@ -76,15 +87,16 @@ public class PersonOrderDAO {
         try {
             StringBuilder sb = new StringBuilder();
             sb.append("select * from person_order where ");
-            sb.append(findPersonOrderRequest.toSQLStringStatement());
+            ToSqlStringStatementForPersonOrder toSqlStringStatementForPersonOrder = new ToSqlStringStatementForPersonOrder();
+            sb.append(toSqlStringStatementForPersonOrder.toSQLStringStatement(findPersonOrderRequest));
             System.out.println(sb.toString());
             statement = connection.createStatement();
             rs = statement.executeQuery(sb.toString());
             while (rs.next()) {
-                personOrder.setOrderId(rs.getObject(1, UUID.class));
-                personOrder.setPersonId(rs.getObject(2, UUID.class));
-                personOrder.setAdress(rs.getString(3));
-                personOrder.setStatusId(rs.getInt(4));
+                personOrder.setOrderId(rs.getObject("order_id", UUID.class));
+                personOrder.setPersonId(rs.getObject("person_id", UUID.class));
+                personOrder.setAdress(rs.getString("adress"));
+                personOrder.setStatusId(rs.getInt("status_id"));
                 list.add(personOrder);
             }
         } catch (Exception e) {
@@ -93,28 +105,28 @@ public class PersonOrderDAO {
         return list;
     }
 
-    public PersonOrder findWithBooks(Connection connection, FindPersonOrderRequest findPersonOrderRequest) {
+    public PersonOrder findWithBooks(FindPersonOrderRequest findPersonOrderRequest) {
         Statement statement;
         PersonOrder personOrder = new PersonOrder();
         ResultSet rs = null;
         try {
             StringBuilder sb = new StringBuilder();
-            sb.append("select po.order_id, po.person_id, po.adress, po.status_id, pohb.book_id, pohb.book_count from person_order AS po left join person_order_has_book AS pohb on po.order_id=pohb.order_id where ");
+            sb.append("select po.*, pohb.*, b.* from person_order AS po left join person_order_has_book AS pohb on po.order_id=pohb.order_id left join book AS b on pohb.book_id=b.book_id where ");
             if (findPersonOrderRequest.getOrderIds() != null) {
                 sb.append("po.order_id ");
-                sb.append("='" + findPersonOrderRequest.getOrderIds() + "' AND ");
+                sb.append("='").append(findPersonOrderRequest.getOrderIds()).append("' AND ");
             }
             if (findPersonOrderRequest.getPersonIds() != null) {
                 sb.append("po.person_id ");
-                sb.append("='" + findPersonOrderRequest.getPersonIds() + "' AND ");
+                sb.append("='").append(findPersonOrderRequest.getPersonIds()).append("' AND ");
             }
             if (findPersonOrderRequest.getAdresses() != null) {
                 sb.append("po.adress ");
-                sb.append("='" + findPersonOrderRequest.getAdresses() + "' AND ");
+                sb.append("='").append(findPersonOrderRequest.getAdresses()).append("' AND ");
             }
             if (findPersonOrderRequest.getStatusIds() != null) {
                 sb.append("po.status_id ");
-                sb.append("='" + findPersonOrderRequest.getStatusIds() + "' AND ");
+                sb.append("='").append(findPersonOrderRequest.getStatusIds()).append("' AND ");
             }
             sb.delete(sb.length() - 4, sb.length());
             sb.append(";");
@@ -122,15 +134,21 @@ public class PersonOrderDAO {
             statement = connection.createStatement();
             rs = statement.executeQuery(sb.toString());
             while (rs.next()) {
-                personOrder.setOrderId(rs.getObject(1, UUID.class));
-                personOrder.setPersonId(rs.getObject(2, UUID.class));
-                personOrder.setAdress(rs.getString(3));
-                personOrder.setStatusId(rs.getInt(4));
+                personOrder.setOrderId(rs.getObject("order_id", UUID.class));
+                personOrder.setPersonId(rs.getObject("person_id", UUID.class));
+                personOrder.setAdress(rs.getString("adress"));
+                personOrder.setStatusId(rs.getInt("status_id"));
                 PersonOrderHasBook personOrderHasBook = new PersonOrderHasBook();
-                personOrderHasBook.setOrderId(rs.getObject(1, UUID.class));
-                personOrderHasBook.setBookId(rs.getObject(5, UUID.class));
-                personOrderHasBook.setBookCount(rs.getInt(6));
-                personOrder.getOrderHasBooks().add(personOrderHasBook);
+                personOrderHasBook.setOrderId(rs.getObject("order_id", UUID.class));
+                personOrderHasBook.setBookId(rs.getObject("book_id", UUID.class));
+                personOrderHasBook.setBookCount(rs.getInt("book_count"));
+                Book book = new Book();
+                book.setBookId(rs.getObject("book_id", UUID.class));
+                book.setBookname(rs.getString("bookname"));
+                book.setAuthor(rs.getString("author"));
+                book.setCostInByn(rs.getInt("cost_in_byn"));
+                book.setCountInStock(rs.getInt("count_in_stock"));
+                personOrder.getBooks().add(book);
             }
         } catch (Exception e) {
             System.out.println(e);
@@ -138,24 +156,26 @@ public class PersonOrderDAO {
         return personOrder;
     }
 
-    public void update(Connection connection, UpdatePersonOrderRequest updatePersonOrderRequest, FindPersonOrderRequest findPersonOrderRequest) {
+
+    public void update(UpdatePersonOrderRequest updatePersonOrderRequest, FindPersonOrderRequest findPersonOrderRequest) {
         Statement statement;
         try {
             StringBuilder sb = new StringBuilder();
             sb.append("update person_order set ");
 
             if (updatePersonOrderRequest.getOrderIds() != null)
-                sb.append("order_id" + "='" + updatePersonOrderRequest.getPersonIds() + "', ");
+                sb.append("order_id='").append(updatePersonOrderRequest.getPersonIds()).append("', ");
             if (updatePersonOrderRequest.getPersonIds() != null)
-                sb.append("person_id" + "='" + updatePersonOrderRequest.getPersonIds() + "', ");
+                sb.append("person_id='").append(updatePersonOrderRequest.getPersonIds()).append("', ");
             if (updatePersonOrderRequest.getAdresses() != null)
-                sb.append("adress" + "='" + updatePersonOrderRequest.getAdresses() + "', ");
+                sb.append("adress='").append(updatePersonOrderRequest.getAdresses()).append("', ");
             if (updatePersonOrderRequest.getStatusIds() != null)
-                sb.append("status_id" + "='" + updatePersonOrderRequest.getStatusIds() + "', ");
+                sb.append("status_id='").append(updatePersonOrderRequest.getStatusIds()).append("', ");
 
             sb.deleteCharAt(sb.lastIndexOf(","));
             sb.append("where ");
-            sb.append(findPersonOrderRequest.toSQLStringStatement());
+            ToSqlStringStatementForPersonOrder toSqlStringStatementForPersonOrder = new ToSqlStringStatementForPersonOrder();
+            sb.append(toSqlStringStatementForPersonOrder.toSQLStringStatement(findPersonOrderRequest));
             System.out.println(sb.toString());
             statement = connection.createStatement();
             statement.executeUpdate(sb.toString());
@@ -165,19 +185,21 @@ public class PersonOrderDAO {
         }
     }
 
-    public PersonOrder updatePersonOrder(Connection connection, PersonOrder personOrder, FindPersonOrderRequest findPersonOrderRequest) {
+    public PersonOrder updatePersonOrder(PersonOrder personOrder) {
+        FindPersonOrderRequest findPersonOrderRequest = new FindPersonOrderRequest().setOrderId(personOrder.getOrderId());
         UpdatePersonOrderRequest updatePersonOrderRequest = new UpdatePersonOrderRequest();
         updatePersonOrderRequest.setOrderId(personOrder.getOrderId()).setPersonId(personOrder.getPersonId()).setAdress(personOrder.getAdress()).setStatusId(personOrder.getStatusId());
-        update(connection, updatePersonOrderRequest, findPersonOrderRequest);
+        update(updatePersonOrderRequest, findPersonOrderRequest);
         return personOrder;
     }
 
-    public void delete(Connection connection, FindPersonOrderRequest findPersonOrderRequest) {
+    public void delete(FindPersonOrderRequest findPersonOrderRequest) {
         Statement statement;
         try {
             StringBuilder sb = new StringBuilder();
             sb.append("delete from person_order where ");
-            sb.append(findPersonOrderRequest.toSQLStringStatement());
+            ToSqlStringStatementForPersonOrder toSqlStringStatementForPersonOrder = new ToSqlStringStatementForPersonOrder();
+            sb.append(toSqlStringStatementForPersonOrder.toSQLStringStatement(findPersonOrderRequest));
             System.out.println(sb.toString());
             statement = connection.createStatement();
             statement.executeUpdate(sb.toString());
@@ -185,5 +207,9 @@ public class PersonOrderDAO {
         } catch (Exception e) {
             System.out.println(e);
         }
+    }
+
+    public PersonOrderDAO(Connection connection) {
+        this.connection = connection;
     }
 }
