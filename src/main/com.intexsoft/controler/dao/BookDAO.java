@@ -1,7 +1,6 @@
 package controler.dao;
 
 import controler.findRequest.FindBookRequest;
-import controler.findRequest.toStringSqlStatement.ToSqlStringStatementForBook;
 import controler.updateRequest.UpdateBookRequest;
 import model.Book;
 
@@ -85,8 +84,7 @@ public class BookDAO {
         try {
             StringBuilder sb = new StringBuilder();
             sb.append("select * from book where ");
-            ToSqlStringStatementForBook toSqlStringStatementForBook = new ToSqlStringStatementForBook();
-            sb.append(toSqlStringStatementForBook.toSQLStringStatement(findBookRequest));
+            sb.append(toSQLStringStatement(findBookRequest));
             System.out.println(sb.toString());
             statement = connection.createStatement();
             rs = statement.executeQuery(sb.toString());
@@ -123,8 +121,7 @@ public class BookDAO {
                 sb.append("count_in_stock='").append(updateBookRequest.getBookCountInStocks()).append("', ");
             sb.deleteCharAt(sb.lastIndexOf(","));
             sb.append("where ");
-            ToSqlStringStatementForBook toSqlStringStatementForBook = new ToSqlStringStatementForBook();
-            sb.append(toSqlStringStatementForBook.toSQLStringStatement(findBookRequest));
+            sb.append(toSQLStringStatement(findBookRequest));
             System.out.println(sb.toString());
             statement = connection.createStatement();
             statement.executeUpdate(sb.toString());
@@ -147,8 +144,8 @@ public class BookDAO {
         try {
             StringBuilder sb = new StringBuilder();
             sb.append("delete from book where ");
-            ToSqlStringStatementForBook toSqlStringStatementForBook = new ToSqlStringStatementForBook();
-            sb.append(toSqlStringStatementForBook.toSQLStringStatement(findBookRequest));
+
+            sb.append(toSQLStringStatement(findBookRequest));
             System.out.println(sb.toString());
             statement = connection.createStatement();
             statement.executeUpdate(sb.toString());
@@ -156,6 +153,77 @@ public class BookDAO {
         } catch (Exception e) {
             System.out.println(e);
         }
+    }
+    public String toSQLStringStatement(FindBookRequest findBookRequest) {
+        StringBuilder sb = new StringBuilder();
+        if (!findBookRequest.getBookIds().isEmpty()) {
+            sb.append("book_id ");
+            if (findBookRequest.getBookIds().size() > 1) {
+                sb.append("in (");
+                for (UUID book_id : findBookRequest.getBookIds()) {
+                    sb.append("'").append(book_id).append("', ");
+                }
+                sb.deleteCharAt(sb.lastIndexOf(","));
+                sb.append(") AND ");
+            } else {
+                sb.append("='").append(findBookRequest.getBookIds().get(0)).append("' AND ");
+            }
+        }
+        if (!findBookRequest.getBookBooknames().isEmpty()) {
+            sb.append("bookname ");
+            if (findBookRequest.getBookBooknames().size() > 1) {
+                sb.append("in (");
+                for (String bookname : findBookRequest.getBookBooknames()) {
+                    sb.append("'").append(bookname).append("', ");
+                }
+                sb.deleteCharAt(sb.lastIndexOf(","));
+                sb.append(") AND ");
+            } else {
+                sb.append("='").append(findBookRequest.getBookBooknames().get(0)).append("' AND ");
+            }
+        }
+        if (!findBookRequest.getBookAuthors().isEmpty()) {
+            sb.append("author ");
+            if (findBookRequest.getBookAuthors().size() > 1) {
+                sb.append("in (");
+                for (String author : findBookRequest.getBookAuthors()) {
+                    sb.append("'").append(author).append("', ");
+                }
+                sb.deleteCharAt(sb.lastIndexOf(","));
+                sb.append(") AND ");
+            } else {
+                sb.append("='").append(findBookRequest.getBookAuthors().get(0)).append("' AND ");
+            }
+        }
+        if (findBookRequest.getBookFromToCostInByns().getFrom()!= null) {
+            sb.append("cost_in_byn ");
+
+            sb.append(">='").append(findBookRequest.getBookFromToCostInByns().getFrom()).append("' AND ");
+        }
+        if (findBookRequest.getBookFromToCostInByns().getTo() != null) {
+            sb.append("cost_in_byn ");
+
+            sb.append("<='").append(findBookRequest.getBookFromToCostInByns().getTo()).append("' AND ");
+        }
+        if (findBookRequest.getBookCostInByns() != null) {
+            sb.append("cost_in_byn='").append(findBookRequest.getBookCostInByns()).append("' AND ");
+        }
+
+        if (findBookRequest.getBookFromToCountInStocks().getFrom() != null) {
+            sb.append("count_in_stock ");
+            sb.append(">='").append(findBookRequest.getBookFromToCountInStocks().getFrom()).append("' AND ");
+        }
+        if (findBookRequest.getBookFromToCountInStocks().getTo() != null) {
+            sb.append("count_in_stock ");
+            sb.append("<='").append(findBookRequest.getBookFromToCountInStocks().getTo()).append("' AND ");
+        }
+        if (findBookRequest.getBookCountInStocks() != null) {
+            sb.append("count_in_stock='").append(findBookRequest.getBookCountInStocks()).append("' AND ");
+        }
+
+        sb.delete(sb.length() - 4, sb.length());
+        sb.append(";");
+        return sb.toString();
     }
 
     public BookDAO(Connection connection) {

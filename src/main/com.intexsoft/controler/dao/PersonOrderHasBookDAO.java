@@ -1,7 +1,6 @@
 package controler.dao;
 
 import controler.findRequest.FindPersonOrderHasBookRequest;
-import controler.findRequest.toStringSqlStatement.ToSqlStringStatementForPersonOrderHasBook;
 import controler.updateRequest.UpdatePersonOrderHasBookRequest;
 import model.PersonOrderHasBook;
 
@@ -79,8 +78,7 @@ public class PersonOrderHasBookDAO {
         try {
             StringBuilder sb = new StringBuilder();
             sb.append("select * from person_order_has_book where ");
-            ToSqlStringStatementForPersonOrderHasBook toSqlStringStatementForPersonOrderHasBook = new ToSqlStringStatementForPersonOrderHasBook();
-            sb.append(toSqlStringStatementForPersonOrderHasBook.toSQLStringStatement(findPersonOrderHasBookRequest));
+            sb.append(toSQLStringStatement(findPersonOrderHasBookRequest));
             System.out.println(sb.toString());
             statement = connection.createStatement();
             rs = statement.executeQuery(sb.toString());
@@ -111,8 +109,7 @@ public class PersonOrderHasBookDAO {
                 sb.append("book_count='").append(updateCartHasBookRequest.getBookCounts()).append("', ");
             sb.deleteCharAt(sb.lastIndexOf(","));
             sb.append("where ");
-            ToSqlStringStatementForPersonOrderHasBook toSqlStringStatementForPersonOrderHasBook = new ToSqlStringStatementForPersonOrderHasBook();
-            sb.append(toSqlStringStatementForPersonOrderHasBook.toSQLStringStatement(findPersonOrderHasBookRequest));
+            sb.append(toSQLStringStatement(findPersonOrderHasBookRequest));
             System.out.println(sb.toString());
             statement = connection.createStatement();
             statement.executeUpdate(sb.toString());
@@ -122,7 +119,7 @@ public class PersonOrderHasBookDAO {
         }
     }
 
-    public PersonOrderHasBook updateCartHasBook(PersonOrderHasBook personOrderHasBook) {
+    public PersonOrderHasBook updatePersonOrderHasBook(PersonOrderHasBook personOrderHasBook) {
         FindPersonOrderHasBookRequest findPersonOrderHasBookRequest = new FindPersonOrderHasBookRequest().setOrderId(personOrderHasBook.getOrderId());
         UpdatePersonOrderHasBookRequest updatePersonOrderHasBookRequest = new UpdatePersonOrderHasBookRequest();
         updatePersonOrderHasBookRequest.setOrderId(personOrderHasBook.getOrderId()).setBookId(personOrderHasBook.getBookId()).setBookCounts(personOrderHasBook.getBookCount());
@@ -135,8 +132,7 @@ public class PersonOrderHasBookDAO {
         try {
             StringBuilder sb = new StringBuilder();
             sb.append("delete from person_order_has_book where ");
-            ToSqlStringStatementForPersonOrderHasBook toSqlStringStatementForPersonOrderHasBook = new ToSqlStringStatementForPersonOrderHasBook();
-            sb.append(toSqlStringStatementForPersonOrderHasBook.toSQLStringStatement(findPersonOrderHasBookRequest));
+            sb.append(toSQLStringStatement(findPersonOrderHasBookRequest));
             System.out.println(sb.toString());
             statement = connection.createStatement();
             statement.executeUpdate(sb.toString());
@@ -145,7 +141,51 @@ public class PersonOrderHasBookDAO {
             System.out.println(e);
         }
     }
-
+    public String toSQLStringStatement(FindPersonOrderHasBookRequest findPersonOrderHasBookRequest) {
+        StringBuilder sb = new StringBuilder();
+        if (!findPersonOrderHasBookRequest.getOrderIds().isEmpty()) {
+            sb.append("order_id ");
+            if (findPersonOrderHasBookRequest.getOrderIds().size() > 1) {
+                sb.append("in (");
+                for (UUID cart_id : findPersonOrderHasBookRequest.getOrderIds()) {
+                    sb.append("'").append(cart_id).append("', ");
+                }
+                sb.deleteCharAt(sb.lastIndexOf(","));
+                sb.append(") AND ");
+            } else {
+                sb.append("='").append(findPersonOrderHasBookRequest.getOrderIds().get(0)).append("' AND ");
+            }
+        }
+        if (!findPersonOrderHasBookRequest.getBookIds().isEmpty()) {
+            sb.append("book_id ");
+            if (findPersonOrderHasBookRequest.getBookIds().size() > 1) {
+                sb.append("in (");
+                for (UUID bookId : findPersonOrderHasBookRequest.getBookIds()) {
+                    sb.append("'").append(bookId).append("', ");
+                }
+                sb.deleteCharAt(sb.lastIndexOf(","));
+                sb.append(") AND ");
+            } else {
+                sb.append("='").append(findPersonOrderHasBookRequest.getBookIds().get(0)).append("' AND ");
+            }
+        }
+        if (!findPersonOrderHasBookRequest.getBookCounts().isEmpty()) {
+            sb.append("book_count ");
+            if (findPersonOrderHasBookRequest.getBookCounts().size() > 1) {
+                sb.append("in (");
+                for (Integer bookCount : findPersonOrderHasBookRequest.getBookCounts()) {
+                    sb.append("'").append(bookCount).append("', ");
+                }
+                sb.deleteCharAt(sb.lastIndexOf(","));
+                sb.append(") AND ");
+            } else {
+                sb.append("='").append(findPersonOrderHasBookRequest.getBookCounts().get(0)).append("' AND ");
+            }
+        }
+        sb.delete(sb.length() - 4, sb.length());
+        sb.append(";");
+        return sb.toString();
+    }
     public PersonOrderHasBookDAO(Connection connection) {
         this.connection = connection;
     }

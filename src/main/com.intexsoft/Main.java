@@ -1,7 +1,9 @@
 import controler.*;
 import controler.dao.*;
 import controler.findRequest.*;
-import model.*;
+import controler.findRequest.fromTo.BookFromToCostInByns;
+import controler.findRequest.fromTo.BookFromToCountInStocks;
+
 
 import java.sql.Connection;
 import java.util.UUID;
@@ -13,14 +15,9 @@ public class Main {
         BookDAO bookDAO = new BookDAO(connection);
         PersonDAO personDAO = new PersonDAO(connection);
         CartDAO cartDAO = new CartDAO(connection);
+        PersonOrderHasBookDAO personOrderHasBook = new PersonOrderHasBookDAO(connection);
         PersonOrderDAO personOrderDAO = new PersonOrderDAO(connection);
-        PersonOrderHasBookDAO personOrderHasBookDAO=new PersonOrderHasBookDAO(connection);
-Book book=new Book();
-book.setBookname("Bible");
-book.setBookId(UUID.randomUUID());
-book.setAuthor("NULL");
-book.setCostInByn(23);
-book.setCountInStock(56);
-bookDAO.createBook(book);
+        PersonOrderHasBookDAO personOrderHasBookDAO = new PersonOrderHasBookDAO(connection);
+
     }
 }

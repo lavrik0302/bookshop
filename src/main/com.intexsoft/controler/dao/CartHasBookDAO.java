@@ -1,7 +1,6 @@
 package controler.dao;
 
 import controler.findRequest.FindCartHasBookRequest;
-import controler.findRequest.toStringSqlStatement.ToSqlStringStatementForCartHasBook;
 import controler.updateRequest.UpdateCartHasBookRequest;
 import model.CartHasBook;
 
@@ -78,8 +77,7 @@ public class CartHasBookDAO {
         try {
             StringBuilder sb = new StringBuilder();
             sb.append("select * from cart_has_book where ");
-            ToSqlStringStatementForCartHasBook toSqlStringStatementForCartHasBook = new ToSqlStringStatementForCartHasBook();
-            sb.append(toSqlStringStatementForCartHasBook.toSQLStringStatement(findCartHasBookRequest));
+            sb.append(toSQLStringStatement(findCartHasBookRequest));
             System.out.println(sb.toString());
             statement = connection.createStatement();
             rs = statement.executeQuery(sb.toString());
@@ -110,8 +108,7 @@ public class CartHasBookDAO {
                 sb.append("book_count='").append(updateCartHasBookRequest.getBookCounts()).append("', ");
             sb.deleteCharAt(sb.lastIndexOf(","));
             sb.append("where ");
-            ToSqlStringStatementForCartHasBook toSqlStringStatementForCartHasBook = new ToSqlStringStatementForCartHasBook();
-            sb.append(toSqlStringStatementForCartHasBook.toSQLStringStatement(findCartHasBookRequest));
+            sb.append(toSQLStringStatement(findCartHasBookRequest));
             System.out.println(sb.toString());
             statement = connection.createStatement();
             statement.executeUpdate(sb.toString());
@@ -134,8 +131,7 @@ public class CartHasBookDAO {
         try {
             StringBuilder sb = new StringBuilder();
             sb.append("delete from cart_has_book where ");
-            ToSqlStringStatementForCartHasBook toSqlStringStatementForCartHasBook = new ToSqlStringStatementForCartHasBook();
-            sb.append(toSqlStringStatementForCartHasBook.toSQLStringStatement(findCartHasBookRequest));
+            sb.append(toSQLStringStatement(findCartHasBookRequest));
             System.out.println(sb.toString());
             statement = connection.createStatement();
             statement.executeUpdate(sb.toString());
@@ -144,7 +140,51 @@ public class CartHasBookDAO {
             System.out.println(e);
         }
     }
-
+    public String toSQLStringStatement(FindCartHasBookRequest findCartHasBookRequest) {
+        StringBuilder sb = new StringBuilder();
+        if (!findCartHasBookRequest.getCartIds().isEmpty()) {
+            sb.append("cart_id ");
+            if (findCartHasBookRequest.getCartIds().size() > 1) {
+                sb.append("in (");
+                for (UUID cart_id : findCartHasBookRequest.getCartIds()) {
+                    sb.append("'").append(cart_id).append("', ");
+                }
+                sb.deleteCharAt(sb.lastIndexOf(","));
+                sb.append(") AND ");
+            } else {
+                sb.append("='").append(findCartHasBookRequest.getCartIds().get(0)).append("' AND ");
+            }
+        }
+        if (!findCartHasBookRequest.getBookIds().isEmpty()) {
+            sb.append("book_id ");
+            if (findCartHasBookRequest.getBookIds().size() > 1) {
+                sb.append("in (");
+                for (UUID bookId : findCartHasBookRequest.getBookIds()) {
+                    sb.append("'").append(bookId).append("', ");
+                }
+                sb.deleteCharAt(sb.lastIndexOf(","));
+                sb.append(") AND ");
+            } else {
+                sb.append("='").append(findCartHasBookRequest.getBookIds().get(0)).append("' AND ");
+            }
+        }
+        if (!findCartHasBookRequest.getBookCounts().isEmpty()) {
+            sb.append("book_count ");
+            if (findCartHasBookRequest.getBookCounts().size() > 1) {
+                sb.append("in (");
+                for (Integer bookCount : findCartHasBookRequest.getBookCounts()) {
+                    sb.append("'").append(bookCount).append("', ");
+                }
+                sb.deleteCharAt(sb.lastIndexOf(","));
+                sb.append(") AND ");
+            } else {
+                sb.append("='").append(findCartHasBookRequest.getBookCounts().get(0)).append("' AND ");
+            }
+        }
+        sb.delete(sb.length() - 4, sb.length());
+        sb.append(";");
+        return sb.toString();
+    }
     public CartHasBookDAO(Connection connection) {
         this.connection = connection;
     }

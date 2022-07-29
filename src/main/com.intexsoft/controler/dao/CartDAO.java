@@ -1,7 +1,6 @@
 package controler.dao;
 
 import controler.findRequest.FindCartRequest;
-import controler.findRequest.toStringSqlStatement.ToSqlStringStatementForCart;
 import controler.updateRequest.UpdateCartRequest;
 import model.Book;
 import model.Cart;
@@ -82,8 +81,8 @@ public class CartDAO {
         try {
             StringBuilder sb = new StringBuilder();
             sb.append("select * from cart where ");
-            ToSqlStringStatementForCart toSqlStringStatementForCart = new ToSqlStringStatementForCart();
-            sb.append(toSqlStringStatementForCart.toSQLStringStatement(findCartRequest));
+
+            sb.append(toSQLStringStatement(findCartRequest));
 
             System.out.println(sb.toString());
             statement = connection.createStatement();
@@ -156,8 +155,7 @@ public class CartDAO {
                 sb.append("cart_name='").append(updateCartRequest.getCartname()).append("', ");
             sb.deleteCharAt(sb.lastIndexOf(","));
             sb.append("where ");
-            ToSqlStringStatementForCart toSqlStringStatementForCart = new ToSqlStringStatementForCart();
-            sb.append(toSqlStringStatementForCart.toSQLStringStatement(findCartRequest));
+            sb.append(toSQLStringStatement(findCartRequest));
             System.out.println(sb.toString());
             statement = connection.createStatement();
             statement.executeUpdate(sb.toString());
@@ -180,8 +178,8 @@ public class CartDAO {
         try {
             StringBuilder sb = new StringBuilder();
             sb.append("delete from cart where ");
-            ToSqlStringStatementForCart toSqlStringStatementForCart = new ToSqlStringStatementForCart();
-            sb.append(toSqlStringStatementForCart.toSQLStringStatement(findCartRequest));
+
+            sb.append(toSQLStringStatement(findCartRequest));
             System.out.println(sb.toString());
             statement = connection.createStatement();
             statement.executeUpdate(sb.toString());
@@ -189,6 +187,24 @@ public class CartDAO {
         } catch (Exception e) {
             System.out.println(e);
         }
+    }
+    public String toSQLStringStatement(FindCartRequest findCartRequest){
+        StringBuilder sb =new StringBuilder();
+        if (findCartRequest.getCartId() != null) {
+            sb.append("cart_id ");
+            sb.append("='").append(findCartRequest.getCartId()).append("' AND ");
+        }
+        if (findCartRequest.getPersonId() != null) {
+            sb.append("person_id ");
+            sb.append("='").append(findCartRequest.getPersonId()).append("' AND ");
+        }
+        if (findCartRequest.getCartname() != null) {
+            sb.append("cart_name ");
+            sb.append("='").append(findCartRequest.getCartname()).append("' AND ");
+        }
+        sb.delete(sb.length() - 4, sb.length());
+        sb.append(";");
+        return sb.toString();
     }
 
     public CartDAO(Connection connection) {

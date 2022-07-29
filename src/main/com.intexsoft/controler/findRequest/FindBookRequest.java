@@ -1,5 +1,8 @@
 package controler.findRequest;
 
+import controler.findRequest.fromTo.BookFromToCostInByns;
+
+import controler.findRequest.fromTo.BookFromToCountInStocks;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -12,12 +15,10 @@ public class FindBookRequest {
     private List<UUID> bookIds = new ArrayList<>();
     private List<String> bookBooknames = new ArrayList<>();
     private List<String> bookAuthors = new ArrayList<>();
-    private Integer bookMoreThanCostInByns;
-    private Integer bookLessThanCostInByns;
+    private BookFromToCostInByns bookFromToCostInByns=new BookFromToCostInByns();
     private Integer bookCostInByns;
     private Integer bookCountInStocks;
-    private Integer bookMoreThanCountInStocks;
-    private Integer bookLessThanCountInStocks;
+    private BookFromToCountInStocks bookFromToCountInStocks=new BookFromToCountInStocks();
 
     public FindBookRequest setBookId(UUID book_id) {
         getBookIds().add(book_id);
@@ -54,28 +55,19 @@ public class FindBookRequest {
         return this;
     }
 
-    public FindBookRequest setBookMoreThanCostInByn(int costInByn) {
-        setBookMoreThanCostInByns(costInByn);
+    public FindBookRequest setFromToCostInByns(BookFromToCostInByns bookFromToCostInByns) {
+        setBookFromToCostInByns(bookFromToCostInByns);
         return this;
     }
 
-    public FindBookRequest setLessThanCostInByn(int costInByn) {
-        setBookLessThanCostInByns(costInByn);
-        return this;
-    }
 
     public FindBookRequest setBookCountInStock(int countInStock) {
         setBookCountInStocks(countInStock);
         return this;
     }
 
-    public FindBookRequest setBookMoreThanCountInStock(int countInStock) {
-        setBookMoreThanCountInStocks(countInStock);
-        return this;
-    }
-
-    public FindBookRequest setBookLessThanCountInStock(int countInStock) {
-        setBookLessThanCountInStocks(countInStock);
+    public FindBookRequest setFromToCountInStocks(BookFromToCountInStocks bookFromToCountInStocks) {
+        setBookFromToCountInStocks(bookFromToCountInStocks);
         return this;
     }
 

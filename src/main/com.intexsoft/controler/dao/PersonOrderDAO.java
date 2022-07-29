@@ -2,7 +2,6 @@ package controler.dao;
 
 import controler.findRequest.FindPersonOrderRequest;
 
-import controler.findRequest.toStringSqlStatement.ToSqlStringStatementForPersonOrder;
 import controler.updateRequest.UpdatePersonOrderRequest;
 import model.Book;
 import model.PersonOrder;
@@ -87,8 +86,7 @@ public class PersonOrderDAO {
         try {
             StringBuilder sb = new StringBuilder();
             sb.append("select * from person_order where ");
-            ToSqlStringStatementForPersonOrder toSqlStringStatementForPersonOrder = new ToSqlStringStatementForPersonOrder();
-            sb.append(toSqlStringStatementForPersonOrder.toSQLStringStatement(findPersonOrderRequest));
+            sb.append(toSQLStringStatement(findPersonOrderRequest));
             System.out.println(sb.toString());
             statement = connection.createStatement();
             rs = statement.executeQuery(sb.toString());
@@ -174,8 +172,7 @@ public class PersonOrderDAO {
 
             sb.deleteCharAt(sb.lastIndexOf(","));
             sb.append("where ");
-            ToSqlStringStatementForPersonOrder toSqlStringStatementForPersonOrder = new ToSqlStringStatementForPersonOrder();
-            sb.append(toSqlStringStatementForPersonOrder.toSQLStringStatement(findPersonOrderRequest));
+            sb.append(toSQLStringStatement(findPersonOrderRequest));
             System.out.println(sb.toString());
             statement = connection.createStatement();
             statement.executeUpdate(sb.toString());
@@ -198,8 +195,7 @@ public class PersonOrderDAO {
         try {
             StringBuilder sb = new StringBuilder();
             sb.append("delete from person_order where ");
-            ToSqlStringStatementForPersonOrder toSqlStringStatementForPersonOrder = new ToSqlStringStatementForPersonOrder();
-            sb.append(toSqlStringStatementForPersonOrder.toSQLStringStatement(findPersonOrderRequest));
+            sb.append(toSQLStringStatement(findPersonOrderRequest));
             System.out.println(sb.toString());
             statement = connection.createStatement();
             statement.executeUpdate(sb.toString());
@@ -207,6 +203,28 @@ public class PersonOrderDAO {
         } catch (Exception e) {
             System.out.println(e);
         }
+    }
+    public String toSQLStringStatement(FindPersonOrderRequest findPersonOrderRequest){
+        StringBuilder sb =new StringBuilder();
+        if (findPersonOrderRequest.getOrderIds() != null) {
+            sb.append("po.order_id ");
+            sb.append("='").append(findPersonOrderRequest.getOrderIds()).append("' AND ");
+        }
+        if (findPersonOrderRequest.getPersonIds() != null) {
+            sb.append("person_id ");
+            sb.append("='").append(findPersonOrderRequest.getPersonIds()).append("' AND ");
+        }
+        if (findPersonOrderRequest.getAdresses() != null) {
+            sb.append("adress ");
+            sb.append("='").append(findPersonOrderRequest.getAdresses()).append("' AND ");
+        }
+        if (findPersonOrderRequest.getStatusIds() != null) {
+            sb.append("status_id ");
+            sb.append("='").append(findPersonOrderRequest.getStatusIds()).append("' AND ");
+        }
+        sb.delete(sb.length() - 4, sb.length());
+        sb.append(";");
+        return sb.toString();
     }
 
     public PersonOrderDAO(Connection connection) {
