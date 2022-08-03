@@ -21,8 +21,8 @@
         <servlet-class>com.intexsoft.servlets.BookServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>BookInOrder</servlet-name>
-        <servlet-class>com.intexsoft.servlets.BookInOrder</servlet-class>
+        <servlet-name>PersonOrderServlet</servlet-name>
+        <servlet-class>com.intexsoft.servlets.PersonOrderServlet</servlet-class>
     </servlet>
     
     <servlet-mapping>
@@ -42,7 +42,7 @@
     <url-pattern>/book</url-pattern>
 </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>BookInOrder</servlet-name>
-        <url-pattern>/bookInOrder</url-pattern>
+        <servlet-name>PersonOrderServlet</servlet-name>
+        <url-pattern>/personOrder</url-pattern>
     </servlet-mapping>
 </web-app>

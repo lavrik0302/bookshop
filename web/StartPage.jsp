@@ -12,9 +12,9 @@
 </head>
 <body>
 <h1>Welcome to BookShop</h1>
-<h1>Use /person GET for find person with orders by personId, POST for adding new person </h1>
+<h1>Use /person GET for finding person with orders by personId, POST for adding new person </h1>
 <h1>Use /book GET for finding book by bookId, POST for adding new book </h1>
 <h1>Use /bookInCart GET for finding books in cart by cartId, POST for adding new book to cart </h1>
-<h1>Use /bookInOrder GET for finding books in order by orderId, POST for adding new book to order </h1>
+<h1>Use /personOrder GET for finding books in order by orderId, POST for adding new PersonOrder from person's cart </h1>
 </body>
 </html>
