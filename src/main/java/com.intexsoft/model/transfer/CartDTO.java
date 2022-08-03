@@ -5,8 +5,8 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class PesronInfoDTO {
-    private String name;
-    private String surname;
-    private String mobilenumber;
+public class CartDTO {
+    private String cartId;
+    private String personId;
+    private String cartname;
 }

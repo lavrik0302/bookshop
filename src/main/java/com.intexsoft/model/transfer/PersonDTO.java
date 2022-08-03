@@ -16,6 +16,6 @@ public class PersonDTO {
     private String name;
     private String surname;
     private String mobilenumber;
-    private Cart personCart;
+    private CartDTO personCart;
     private PersonOrderDTO [] personOrders;
 }

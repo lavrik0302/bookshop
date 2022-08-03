@@ -15,5 +15,4 @@ public class PersonOrderDTO {
     private String adress;
     private Integer statusId;
     private BookDTO[] books;
-
 }

@@ -1,18 +1,20 @@
 package com.intexsoft.servlets;
 
 import com.intexsoft.controler.ConnectToDb;
+import com.intexsoft.controler.dao.CartDAO;
 import com.intexsoft.controler.dao.PersonDAO;
+import com.intexsoft.controler.findRequest.FindCartRequest;
 import com.intexsoft.controler.findRequest.FindPersonRequest;
 import com.intexsoft.model.Book;
+import com.intexsoft.model.Cart;
 import com.intexsoft.model.Person;
 import com.intexsoft.model.PersonOrder;
-import com.intexsoft.model.transfer.BookDTO;
-import com.intexsoft.model.transfer.PersonDTO;
-import com.intexsoft.model.transfer.PersonOrderDTO;
-import com.intexsoft.model.transfer.PesronInfoDTO;
+import com.intexsoft.model.transfer.*;
 import com.intexsoft.parser.JsonDeserializer;
 import com.intexsoft.parser.Mapper;
 import com.intexsoft.serializer.JsonSerializer;
+import lombok.Data;
+
 import javax.servlet.*;
 import javax.servlet.http.*;
 import javax.servlet.annotation.*;
@@ -24,48 +26,57 @@ import java.util.UUID;
 
 @WebServlet(name = "PersonServlet", value = "/PersonServlet")
 public class PersonServlet extends HttpServlet {
+
+    ConnectToDb connectToDb = new ConnectToDb();
+    Connection connection = connectToDb.connect_to_db("bookshop", "postgres", "postgrespw");
+    PersonDAO personDAO = new PersonDAO(connection);
+    JsonSerializer jsonSerializer = new JsonSerializer();
+    Mapper mapper = new Mapper();
+    CartDAO cartDAO = new CartDAO(connection);
+
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String stringUUId = request.getParameter("uuid");
         PrintWriter pw = response.getWriter();
         UUID uuid = UUID.fromString(stringUUId);
-        ConnectToDb connectToDb = new ConnectToDb();
-        Connection connection = connectToDb.connect_to_db("bookshop", "postgres", "postgrespw");
-        PersonDAO personDAO = new PersonDAO(connection);
         Person person = personDAO.findWithPersonOrdersWithBooks(new FindPersonRequest().setPersonId(uuid));
-        JsonSerializer jsonSerializer = new JsonSerializer();
         PersonDTO personDTO = new PersonDTO();
         personDTO.setPersonId(person.getPersonId().toString());
         personDTO.setName(person.getName());
         personDTO.setSurname(person.getSurname());
         personDTO.setMobilenumber(person.getMobilenumber());
-        personDTO.setPersonCart(person.getPersonCart());
-        int q = person.getPersonOrders().size();
-        PersonOrderDTO[] personOrderDTOList = new PersonOrderDTO[q];
-        int i = 0;
+        Cart cart = cartDAO.find(new FindCartRequest().setCartPersonId(person.getPersonId()));
+        CartDTO cartDTO = new CartDTO();
+        cartDTO.setPersonId(cart.getPersonId().toString());
+        cartDTO.setCartId(cart.getCartId().toString());
+        cartDTO.setCartname(cart.getCartname());
+        personDTO.setPersonCart(cartDTO);
+        int numberOfOrders = person.getPersonOrders().size();
+        PersonOrderDTO[] personOrderDTOList = new PersonOrderDTO[numberOfOrders];
+        int orderCounter = 0;
         for (PersonOrder personOrder : person.getPersonOrders()) {
             PersonOrderDTO personOrderDTO = new PersonOrderDTO();
             personOrderDTO.setPersonId(personOrder.getPersonId().toString());
             personOrderDTO.setOrderId(personOrder.getOrderId().toString());
             personOrderDTO.setAdress(personOrder.getAdress());
             personOrderDTO.setStatusId(personOrder.getStatusId());
-            int a = person.getPersonOrders().get(i).getBooks().size();
-            BookDTO[] bookDTOList = new BookDTO[a];
-            int j = 0;
-            for (Book book : person.getPersonOrders().get(i).getBooks()) {
+            int numberOfBooks = person.getPersonOrders().get(orderCounter).getBooks().size();
+            BookDTO[] bookDTOList = new BookDTO[numberOfBooks];
+            int bookCounter = 0;
+            for (Book book : person.getPersonOrders().get(orderCounter).getBooks()) {
                 BookDTO bookDTO = new BookDTO();
                 bookDTO.setBookId(book.getBookId().toString());
                 bookDTO.setBookname(book.getBookname());
                 bookDTO.setAuthor(book.getAuthor());
                 bookDTO.setCostInByn(book.getCostInByn());
                 bookDTO.setCountInStock(book.getCountInStock());
-                bookDTOList[j] = bookDTO;
-                j++;
+                bookDTOList[bookCounter] = bookDTO;
+                bookCounter++;
             }
-
             personOrderDTO.setBooks(bookDTOList);
-            personOrderDTOList[i] = personOrderDTO;
-            i++;
+            personOrderDTOList[orderCounter] = personOrderDTO;
+            orderCounter++;
         }
         personDTO.setPersonOrders(personOrderDTOList);
         String json = jsonSerializer.serialize(personDTO);
@@ -90,20 +101,18 @@ public class PersonServlet extends HttpServlet {
         while (!servletInputStream.isFinished()) {
             sb.append(Character.valueOf((char) servletInputStream.read()));
         }
-        ConnectToDb connectToDb = new ConnectToDb();
-        Connection connection = connectToDb.connect_to_db("bookshop", "postgres", "postgrespw");
-        PersonDAO personDAO = new PersonDAO(connection);
         JsonDeserializer jsonDeserializer = new JsonDeserializer(sb.toString());
-        Mapper mapper = new Mapper();
-        PesronInfoDTO pesronInfoDTO = new PesronInfoDTO();
-        pesronInfoDTO = mapper.map(jsonDeserializer.parseValue(), PesronInfoDTO.class);
+
+        PesronInfoDTO pesronInfoDTO= mapper.map(jsonDeserializer.parseValue(), PesronInfoDTO.class);
         Person person = personDAO.createRow(pesronInfoDTO.getName(), pesronInfoDTO.getSurname(), pesronInfoDTO.getMobilenumber());
+        String cartname = person.getSurname() + " cart";
+        cartDAO.createRow(person.getPersonId(), cartname);
         pw.println("<html>");
         pw.println("<h1> personId = " + person.getPersonId() + "</h1>");
         pw.println("<h1> name = " + person.getName() + "</h1>");
         pw.println("<h1> surname = " + person.getSurname() + "</h1>");
         pw.println("<h1> mobileNumber = " + person.getMobilenumber() + "</h1>");
-
+        pw.println("<h1> As Json = " + jsonSerializer.serialize(pesronInfoDTO) + "</h1>");
         pw.println("</html>");
 
 
