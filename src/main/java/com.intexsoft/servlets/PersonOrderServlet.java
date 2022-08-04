@@ -4,11 +4,9 @@ import com.intexsoft.controler.ConnectToDb;
 import com.intexsoft.controler.dao.*;
 import com.intexsoft.controler.findRequest.*;
 import com.intexsoft.controler.updateRequest.UpdateBookRequest;
+import com.intexsoft.controler.updateRequest.UpdatePersonOrderRequest;
 import com.intexsoft.model.*;
-import com.intexsoft.model.transfer.BookDTO;
-import com.intexsoft.model.transfer.CreatePersonOrderDTO;
-import com.intexsoft.model.transfer.PersonOrderDTO;
-import com.intexsoft.model.transfer.PersonOrderHasBookDTO;
+import com.intexsoft.model.transfer.*;
 import com.intexsoft.parser.JsonDeserializer;
 import com.intexsoft.parser.Mapper;
 import com.intexsoft.serializer.JsonSerializer;
@@ -124,5 +122,51 @@ public class PersonOrderServlet extends HttpServlet {
         personOrderDTO.setBooks(bookArr);
         pw.println("<h1> As JSON = " + jsonSerializer.serialize(personOrderDTO) + "</h1>");
         pw.println("</html>");
+    }
+
+    @Override
+    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        ServletInputStream servletInputStream = request.getInputStream();
+        PrintWriter pw = response.getWriter();
+        StringBuilder sb = new StringBuilder();
+        while (!servletInputStream.isFinished()) {
+            sb.append(Character.valueOf((char) servletInputStream.read()));
+        }
+        JsonDeserializer jsonDeserializer = new JsonDeserializer(sb.toString());
+        UpdateOrderStatusDTO updateOrderStatusDTO = mapper.map(jsonDeserializer.parseValue(), UpdateOrderStatusDTO.class);
+        personOrderDAO.update(new UpdatePersonOrderRequest()
+                        .setStatusId(updateOrderStatusDTO.getStatusId())
+                , new FindPersonOrderRequest()
+                        .setOrderId(UUID.fromString(updateOrderStatusDTO.getOrderId())));
+        pw.println("<html>");
+        pw.println("<h1> orderId = " + updateOrderStatusDTO.getOrderId() + "</h1>");
+        pw.println("<h1> statusId = " + updateOrderStatusDTO.getStatusId() + "</h1>");
+        pw.println("<h1> As JSON = " + jsonSerializer.serialize(updateOrderStatusDTO) + "</h1>");
+        pw.println("</html>");
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        ServletInputStream servletInputStream = request.getInputStream();
+        PrintWriter pw = response.getWriter();
+        StringBuilder sb = new StringBuilder();
+        while (!servletInputStream.isFinished()) {
+            sb.append(Character.valueOf((char) servletInputStream.read()));
+        }
+        JsonDeserializer jsonDeserializer = new JsonDeserializer(sb.toString());
+        DeleteDTO deleteDTO = mapper.map(jsonDeserializer.parseValue(), DeleteDTO.class);
+        PersonOrder personOrder = personOrderDAO.find(new FindPersonOrderRequest().setOrderId(UUID.fromString(deleteDTO.getUuid()))).get(0);
+        CreatePersonOrderDTO createPersonOrderDTO=new CreatePersonOrderDTO();
+        pw.println("<html>");
+        pw.println("<h1> orderId = " + personOrder.getOrderId() + "</h1>");
+        pw.println("<h1> personId = " + personOrder.getPersonId() + "</h1>");
+        createPersonOrderDTO.setPersonId(personOrder.getPersonId().toString());
+        pw.println("<h1> adress = " + personOrder.getAdress() + "</h1>");
+        createPersonOrderDTO.setAdress(personOrder.getAdress());
+        pw.println("<h1> statusId = " + personOrder.getStatusId() + "</h1>");
+        createPersonOrderDTO.setStatusId(personOrder.getStatusId());
+        pw.println("<h1> As JSON = " + jsonSerializer.serialize(createPersonOrderDTO) + "</h1>");
+        pw.println("</html>");
+        personOrderDAO.delete(new FindPersonOrderRequest().setOrderId(personOrder.getOrderId()));
     }
 }

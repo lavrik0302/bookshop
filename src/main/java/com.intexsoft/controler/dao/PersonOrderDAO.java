@@ -208,7 +208,7 @@ public class PersonOrderDAO {
     public String toSQLStringStatement(FindPersonOrderRequest findPersonOrderRequest) {
         StringBuilder sb = new StringBuilder();
         if (findPersonOrderRequest.getOrderIds() != null) {
-            sb.append("po.order_id ");
+            sb.append("order_id ");
             sb.append("='").append(findPersonOrderRequest.getOrderIds()).append("' AND ");
         }
         if (findPersonOrderRequest.getPersonIds() != null) {

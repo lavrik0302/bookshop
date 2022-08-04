@@ -8,6 +8,7 @@ import com.intexsoft.controler.findRequest.FindPersonRequest;
 import com.intexsoft.model.Book;
 import com.intexsoft.model.transfer.BookDTO;
 import com.intexsoft.model.transfer.CreateBookDTO;
+import com.intexsoft.model.transfer.DeleteDTO;
 import com.intexsoft.model.transfer.PersonDTO;
 import com.intexsoft.parser.JsonDeserializer;
 import com.intexsoft.parser.Mapper;
@@ -63,8 +64,8 @@ public class BookServlet extends HttpServlet {
         while (!servletInputStream.isFinished()) {
             sb.append(Character.valueOf((char) servletInputStream.read()));
         }
-        JsonDeserializer jsonDeserializers = new JsonDeserializer(sb.toString());
-        CreateBookDTO createBookDTO = mapper.map(jsonDeserializers.parseValue(), CreateBookDTO.class);
+        JsonDeserializer jsonDeserializer = new JsonDeserializer(sb.toString());
+        CreateBookDTO createBookDTO = mapper.map(jsonDeserializer.parseValue(), CreateBookDTO.class);
         pw.println("<html>");
         Book book = bookDAO.createRow(createBookDTO.getBookname(), createBookDTO.getAuthor(), createBookDTO.getCostInByn(), createBookDTO.getCountInStock());
         pw.println("<h1> bookid = " + book.getBookId() + "</h1>");
@@ -82,4 +83,60 @@ public class BookServlet extends HttpServlet {
         pw.println("</html>");
 
     }
+
+    @Override
+    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        ServletInputStream servletInputStream = request.getInputStream();
+        PrintWriter pw = response.getWriter();
+        StringBuilder sb = new StringBuilder();
+        while (!servletInputStream.isFinished()) {
+            sb.append(Character.valueOf((char) servletInputStream.read()));
+        }
+        JsonDeserializer jsonDeserializer = new JsonDeserializer(sb.toString());
+        BookDTO bookDTO = mapper.map(jsonDeserializer.parseValue(), BookDTO.class);
+        Book book = new Book();
+        pw.println("<html>");
+        book.setBookId(UUID.fromString(bookDTO.getBookId()));
+        pw.println("<h1> bookId = " + book.getBookId() + "</h1>");
+        book.setBookname(bookDTO.getBookname());
+        pw.println("<h1> bookname = " + book.getBookname() + "</h1>");
+        book.setAuthor(bookDTO.getAuthor());
+        pw.println("<h1> author = " + book.getAuthor() + "</h1>");
+        book.setCostInByn(bookDTO.getCostInByn());
+        pw.println("<h1> costInByn = " + book.getCostInByn() + "</h1>");
+        book.setCountInStock(bookDTO.getCountInStock());
+        pw.println("<h1> countInStock = " + book.getCountInStock() + "</h1>");
+        bookDAO.updateBook(book);
+        pw.println("<h1> As JSON = " + jsonSerializer.serialize(bookDTO) + "</h1>");
+        pw.println("</html>");
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        ServletInputStream servletInputStream = request.getInputStream();
+        PrintWriter pw = response.getWriter();
+        StringBuilder sb = new StringBuilder();
+        while (!servletInputStream.isFinished()) {
+            sb.append(Character.valueOf((char) servletInputStream.read()));
+        }
+        JsonDeserializer jsonDeserializer = new JsonDeserializer(sb.toString());
+        DeleteDTO deleteDTO = mapper.map(jsonDeserializer.parseValue(), DeleteDTO.class);
+        Book book = bookDAO.find(new FindBookRequest().setBookId(UUID.fromString(deleteDTO.getUuid()))).get(0);
+        pw.println("<html>");
+        BookDTO bookDTO = new BookDTO();
+        bookDTO.setBookId(book.getBookId().toString());
+        pw.println("<h1> bookId = " + book.getBookId() + "</h1>");
+        bookDTO.setBookname(book.getBookname());
+        pw.println("<h1> bookname = " + book.getBookname() + "</h1>");
+        bookDTO.setAuthor(book.getAuthor());
+        pw.println("<h1> author = " + book.getAuthor() + "</h1>");
+        bookDTO.setCostInByn(book.getCostInByn());
+        pw.println("<h1> costInByn = " + book.getCostInByn() + "</h1>");
+        bookDTO.setCountInStock(book.getCountInStock());
+        pw.println("<h1> countInStock = " + book.getCountInStock() + "</h1>");
+        bookDAO.delete(new FindBookRequest().setBookId(book.getBookId()));
+        pw.println("<h1> As JSON = " + jsonSerializer.serialize(bookDTO) + "</h1>");
+        pw.println("</html>");
+    }
+
 }

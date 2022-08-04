@@ -2,12 +2,16 @@ package com.intexsoft.servlets;
 
 import com.intexsoft.controler.ConnectToDb;
 import com.intexsoft.controler.dao.BookDAO;
+import com.intexsoft.controler.dao.CartDAO;
 import com.intexsoft.controler.dao.CartHasBookDAO;
 import com.intexsoft.controler.findRequest.FindBookRequest;
 import com.intexsoft.controler.findRequest.FindCartHasBookRequest;
+import com.intexsoft.controler.updateRequest.UpdateCartHasBookRequest;
 import com.intexsoft.model.Book;
 import com.intexsoft.model.CartHasBook;
 import com.intexsoft.model.transfer.CartHasBookDTO;
+import com.intexsoft.model.transfer.DeleteBookFromCartDTO;
+import com.intexsoft.model.transfer.DeleteDTO;
 import com.intexsoft.parser.JsonDeserializer;
 import com.intexsoft.parser.Mapper;
 import com.intexsoft.serializer.JsonSerializer;
@@ -76,5 +80,59 @@ public class BookInCart extends HttpServlet {
         pw.println("<h1> bookCount = " + cartHasBookDTO.getBookCount() + "</h1>");
         pw.println("<h1> As JSON = " + jsonSerializer.serialize(cartHasBookDTO) + "</h1>");
         pw.println("</html>");
+    }
+
+
+    @Override
+    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        ServletInputStream servletInputStream = request.getInputStream();
+        PrintWriter pw = response.getWriter();
+        StringBuilder sb = new StringBuilder();
+        while (!servletInputStream.isFinished()) {
+            sb.append(Character.valueOf((char) servletInputStream.read()));
+        }
+        JsonDeserializer jsonDeserializer = new JsonDeserializer(sb.toString());
+        CartHasBookDTO cartHasBookDTO = mapper.map(jsonDeserializer.parseValue(), CartHasBookDTO.class);
+        cartHasBookDAO.update(new UpdateCartHasBookRequest()
+                        .setCartId(UUID.fromString(cartHasBookDTO.getCartId()))
+                        .setBookId(UUID.fromString(cartHasBookDTO.getBookId()))
+                        .setBookCount(cartHasBookDTO.getBookCount())
+                , new FindCartHasBookRequest()
+                        .setCartId(UUID.fromString(cartHasBookDTO.getCartId()))
+                        .setBookId(UUID.fromString(cartHasBookDTO.getBookId())));
+        pw.println("<html>");
+        pw.println("<h1> cartId = " + cartHasBookDTO.getCartId() + "</h1>");
+        pw.println("<h1> bookId = " + cartHasBookDTO.getBookId() + "</h1>");
+        pw.println("<h1> bookCount = " + cartHasBookDTO.getBookCount() + "</h1>");
+        pw.println("<h1> As JSON = " + jsonSerializer.serialize(cartHasBookDTO) + "</h1>");
+        pw.println("</html>");
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        ServletInputStream servletInputStream = request.getInputStream();
+        PrintWriter pw = response.getWriter();
+        StringBuilder sb = new StringBuilder();
+        while (!servletInputStream.isFinished()) {
+            sb.append(Character.valueOf((char) servletInputStream.read()));
+        }
+        JsonDeserializer jsonDeserializer = new JsonDeserializer(sb.toString());
+        DeleteBookFromCartDTO deleteBookFromCartDTO = mapper.map(jsonDeserializer.parseValue(), DeleteBookFromCartDTO.class);
+        CartHasBook cartHasBook = cartHasBookDAO
+                .find(new FindCartHasBookRequest()
+                        .setCartId(UUID.fromString(deleteBookFromCartDTO.getCartId()))
+                        .setBookId(UUID.fromString(deleteBookFromCartDTO.getBookId())))
+                .get(0);
+        CartHasBookDTO cartHasBookDTO = new CartHasBookDTO();
+        cartHasBookDTO.setCartId(cartHasBook.getCartId().toString());
+        cartHasBookDTO.setBookId(cartHasBook.getBookId().toString());
+        cartHasBookDTO.setBookCount(cartHasBook.getBookCount());
+        pw.println("<html>");
+        pw.println("<h1> cartId = " + cartHasBookDTO.getCartId() + "</h1>");
+        pw.println("<h1> bookId = " + cartHasBookDTO.getBookId() + "</h1>");
+        pw.println("<h1> bookCount = " + cartHasBookDTO.getBookCount() + "</h1>");
+        pw.println("<h1> As JSON = " + jsonSerializer.serialize(cartHasBookDTO) + "</h1>");
+        pw.println("</html>");
+        cartHasBookDAO.delete(new FindCartHasBookRequest().setCartId(cartHasBook.getCartId()).setBookId(cartHasBook.getBookId()));
     }
 }

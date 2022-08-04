@@ -4,6 +4,7 @@ import com.intexsoft.controler.ConnectToDb;
 import com.intexsoft.controler.dao.CartDAO;
 import com.intexsoft.controler.dao.PersonDAO;
 import com.intexsoft.controler.dao.PersonOrderHasBookDAO;
+import com.intexsoft.controler.findRequest.FindBookRequest;
 import com.intexsoft.controler.findRequest.FindCartRequest;
 import com.intexsoft.controler.findRequest.FindPersonOrderHasBookRequest;
 import com.intexsoft.controler.findRequest.FindPersonRequest;
@@ -12,7 +13,6 @@ import com.intexsoft.model.transfer.*;
 import com.intexsoft.parser.JsonDeserializer;
 import com.intexsoft.parser.Mapper;
 import com.intexsoft.serializer.JsonSerializer;
-import lombok.Data;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
@@ -99,7 +99,6 @@ public class PersonServlet extends HttpServlet {
             sb.append(Character.valueOf((char) servletInputStream.read()));
         }
         JsonDeserializer jsonDeserializer = new JsonDeserializer(sb.toString());
-
         PesronInfoDTO pesronInfoDTO = mapper.map(jsonDeserializer.parseValue(), PesronInfoDTO.class);
         Person person = personDAO.createRow(pesronInfoDTO.getName(), pesronInfoDTO.getSurname(), pesronInfoDTO.getMobilenumber());
         String cartname = person.getSurname() + " cart";
@@ -111,7 +110,56 @@ public class PersonServlet extends HttpServlet {
         pw.println("<h1> mobileNumber = " + person.getMobilenumber() + "</h1>");
         pw.println("<h1> As JSON = " + jsonSerializer.serialize(pesronInfoDTO) + "</h1>");
         pw.println("</html>");
+    }
 
+    @Override
+    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        ServletInputStream servletInputStream = request.getInputStream();
+        PrintWriter pw = response.getWriter();
+        StringBuilder sb = new StringBuilder();
+        while (!servletInputStream.isFinished()) {
+            sb.append(Character.valueOf((char) servletInputStream.read()));
+        }
+        JsonDeserializer jsonDeserializer = new JsonDeserializer(sb.toString());
+        PersonDeleteUpdateDTO personUpdateDTO = mapper.map(jsonDeserializer.parseValue(), PersonDeleteUpdateDTO.class);
+        Person person = new Person();
+        pw.println("<html>");
+        person.setPersonId(UUID.fromString(personUpdateDTO.getPersonId()));
+        pw.println("<h1> personId = " + person.getPersonId() + "</h1>");
+        person.setName(personUpdateDTO.getName());
+        pw.println("<h1> name = " + person.getName() + "</h1>");
+        person.setSurname(personUpdateDTO.getSurname());
+        pw.println("<h1> surname = " + person.getSurname() + "</h1>");
+        person.setMobilenumber(personUpdateDTO.getMobilenumber());
+        pw.println("<h1> mobilenumber = " + person.getMobilenumber() + "</h1>");
+        personDAO.updatePerson(person);
+        pw.println("<h1> As JSON = " + jsonSerializer.serialize(personUpdateDTO) + "</h1>");
+        pw.println("</html>");
+    }
 
+    @Override
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        ServletInputStream servletInputStream = request.getInputStream();
+        PrintWriter pw = response.getWriter();
+        StringBuilder sb = new StringBuilder();
+        while (!servletInputStream.isFinished()) {
+            sb.append(Character.valueOf((char) servletInputStream.read()));
+        }
+        JsonDeserializer jsonDeserializer = new JsonDeserializer(sb.toString());
+        DeleteDTO deleteDTO = mapper.map(jsonDeserializer.parseValue(), DeleteDTO.class);
+        Person person = personDAO.find(new FindPersonRequest().setPersonId(UUID.fromString(deleteDTO.getUuid()))).get(0);
+        pw.println("<html>");
+        PersonDeleteUpdateDTO personDeleteUpdateDTO = new PersonDeleteUpdateDTO();
+        personDeleteUpdateDTO.setPersonId(person.getPersonId().toString());
+        pw.println("<h1> personId = " + person.getPersonId() + "</h1>");
+        personDeleteUpdateDTO.setName(person.getName());
+        pw.println("<h1> name = " + person.getName() + "</h1>");
+        personDeleteUpdateDTO.setSurname(person.getSurname());
+        pw.println("<h1> surname = " + person.getSurname() + "</h1>");
+        personDeleteUpdateDTO.setMobilenumber(person.getMobilenumber());
+        pw.println("<h1> mobilenumber = " + person.getMobilenumber() + "</h1>");
+        personDAO.delete(new FindPersonRequest().setPersonId(person.getPersonId()));
+        pw.println("<h1> As JSON = " + jsonSerializer.serialize(personDeleteUpdateDTO) + "</h1>");
+        pw.println("</html>");
     }
 }
