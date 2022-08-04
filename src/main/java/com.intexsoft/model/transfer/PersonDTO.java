@@ -9,6 +9,7 @@ import java.sql.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
 @Data
 @NoArgsConstructor
 public class PersonDTO {
@@ -17,5 +18,5 @@ public class PersonDTO {
     private String surname;
     private String mobilenumber;
     private CartDTO personCart;
-    private PersonOrderDTO [] personOrders;
+    private PersonOrderDTO[] personOrders;
 }

@@ -50,7 +50,7 @@ public class BookServlet extends HttpServlet {
         pw.println("<h1> author = " + book.getAuthor() + "</h1>");
         pw.println("<h1> cost_in_byn = " + book.getCostInByn() + "</h1>");
         pw.println("<h1> count_in_stock = " + book.getCountInStock() + "</h1>");
-        pw.println("<h1> as JSON = " + json + "</h1>");
+        pw.println("<h1> As JSON = " + json + "</h1>");
         pw.println("</html>");
     }
 
@@ -72,13 +72,13 @@ public class BookServlet extends HttpServlet {
         pw.println("<h1> author = " + book.getAuthor() + "</h1>");
         pw.println("<h1> costInByn = " + book.getCostInByn() + "</h1>");
         pw.println("<h1> countInStock = " + book.getCountInStock() + "</h1>");
-        BookDTO bookDTO=new BookDTO();
+        BookDTO bookDTO = new BookDTO();
         bookDTO.setAuthor(book.getAuthor());
         bookDTO.setBookname(book.getBookname());
         bookDTO.setCountInStock(book.getCountInStock());
         bookDTO.setCostInByn(book.getCostInByn());
         bookDTO.setBookId(book.getBookId().toString());
-        pw.println("<h1> As Json = " + jsonSerializer.serialize(bookDTO) + "</h1>");
+        pw.println("<h1> As JSON = " + jsonSerializer.serialize(bookDTO) + "</h1>");
         pw.println("</html>");
 
     }

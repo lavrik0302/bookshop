@@ -35,7 +35,7 @@ public class FindPersonRequest {
         return this;
     }
 
-    public FindPersonRequest setPersonId(List <UUID> person_ids) {
+    public FindPersonRequest setPersonId(List<UUID> person_ids) {
         getPersonIds().addAll(person_ids);
         return this;
     }

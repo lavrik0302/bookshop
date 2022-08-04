@@ -5,6 +5,7 @@ import com.intexsoft.controler.dao.*;
 import com.intexsoft.controler.findRequest.*;
 import com.intexsoft.controler.updateRequest.UpdateBookRequest;
 import com.intexsoft.model.*;
+import com.intexsoft.model.transfer.BookDTO;
 import com.intexsoft.model.transfer.CreatePersonOrderDTO;
 import com.intexsoft.model.transfer.PersonOrderDTO;
 import com.intexsoft.model.transfer.PersonOrderHasBookDTO;
@@ -31,7 +32,7 @@ public class PersonOrderServlet extends HttpServlet {
     PersonOrderHasBookDAO personOrderHasBookDAO = new PersonOrderHasBookDAO(connection);
     CartHasBookDAO cartHasBookDAO = new CartHasBookDAO(connection);
     BookDAO bookDAO = new BookDAO(connection);
-JsonSerializer jsonSerializer=new JsonSerializer();
+    JsonSerializer jsonSerializer = new JsonSerializer();
     Mapper mapper = new Mapper();
 
     @Override
@@ -40,21 +41,33 @@ JsonSerializer jsonSerializer=new JsonSerializer();
         PrintWriter pw = response.getWriter();
         UUID uuid = UUID.fromString(stringUUId);
         PersonOrder personOrder = personOrderDAO.findWithBooks(new FindPersonOrderRequest().setOrderId(uuid));
+        PersonOrderDTO personOrderDTO = new PersonOrderDTO();
         pw.println("<html>");
         pw.println("<h1> orderId = " + personOrder.getOrderId() + "</h1>");
+        personOrderDTO.setOrderId(personOrder.getOrderId().toString());
         pw.println("<h1> personId = " + personOrder.getPersonId() + "</h1>");
+        personOrderDTO.setPersonId(personOrder.getPersonId().toString());
         pw.println("<h1> adress = " + personOrder.getAdress() + "</h1>");
+        personOrderDTO.setAdress(personOrder.getAdress());
         pw.println("<h1> status = " + personOrder.getStringStatusId() + "</h1>");
+        personOrderDTO.setStatusId(personOrder.getStatusId());
         pw.println("<h1> books </h1>");
-        List<Book> list = personOrder.getBooks();
-        for (Book book : list) {
-            pw.println("<h1> bookId = " + book.getBookId() + "</h1>");
-            pw.println("<h1> bookname = " + book.getBookname() + "</h1>");
-            pw.println("<h1> author = " + book.getAuthor() + "</h1>");
-            pw.println("<h1> costInByn = " + book.getCostInByn() + "</h1>");
+        List<PersonOrderHasBook> list = personOrderHasBookDAO.find(new FindPersonOrderHasBookRequest().setOrderId(personOrder.getOrderId()));
+        PersonOrderHasBookDTO[] bookArr = new PersonOrderHasBookDTO[list.size()];
+        int bookCounter = 0;
+        for (PersonOrderHasBook personOrderHasBook : list) {
+            PersonOrderHasBookDTO personOrderHasBookDTO = new PersonOrderHasBookDTO();
+            pw.println("<h1> bookId = " + personOrderHasBook.getBookId() + "</h1>");
+            personOrderHasBookDTO.setBookId(personOrderHasBook.getBookId().toString());
+            pw.println("<h1> bookCount = " + personOrderHasBook.getBookCount() + "</h1>");
+            personOrderHasBookDTO.setBookCount(personOrderHasBook.getBookCount());
+            personOrderHasBookDTO.setOrderId(personOrder.getOrderId().toString());
+            bookArr[bookCounter] = personOrderHasBookDTO;
+            bookCounter++;
             pw.println("<h1> -----------------------</h1>");
         }
-        pw.println("<h1> As Json = " + jsonSerializer.serialize(personOrder) + "</h1>");
+        personOrderDTO.setBooks(bookArr);
+        pw.println("<h1> As JSON = " + jsonSerializer.serialize(personOrderDTO) + "</h1>");
         pw.println("</html>");
     }
 
@@ -80,21 +93,36 @@ JsonSerializer jsonSerializer=new JsonSerializer();
         for (CartHasBook cartHasBook : listOfBooks) {
             personOrderHasBookDAO.createRow(uuid, cartHasBook.getBookId(), cartHasBook.getBookCount());
             cartHasBookDAO.delete(new FindCartHasBookRequest().setCartId(cart.getCartId()).setBookId(cartHasBook.getBookId()));
-            Book book=bookDAO.find(new FindBookRequest().setBookId(cartHasBook.getBookId())).get(0);
-            book.setCountInStock(book.getCountInStock()-cartHasBook.getBookCount());
+            Book book = bookDAO.find(new FindBookRequest().setBookId(cartHasBook.getBookId())).get(0);
+            book.setCountInStock(book.getCountInStock() - cartHasBook.getBookCount());
             bookDAO.updateBook(book);
         }
+        PersonOrderDTO personOrderDTO = new PersonOrderDTO();
         pw.println("<html>");
         pw.println("<h1> orderId = " + personOrder.getOrderId() + "</h1>");
+        personOrderDTO.setOrderId(personOrder.getOrderId().toString());
         pw.println("<h1> personId = " + personOrder.getPersonId() + "</h1>");
+        personOrderDTO.setPersonId(personOrder.getPersonId().toString());
         pw.println("<h1> adress = " + personOrder.getAdress() + "</h1>");
+        personOrderDTO.setAdress(personOrder.getAdress());
         pw.println("<h1> status = " + personOrder.getStringStatusId() + "</h1>");
+        personOrderDTO.setStatusId(personOrder.getStatusId());
         pw.println("<h1> books </h1>");
+        PersonOrderHasBookDTO[] bookArr = new PersonOrderHasBookDTO[listOfBooks.size()];
+        int bookCounter = 0;
         for (CartHasBook book : listOfBooks) {
+            PersonOrderHasBookDTO temp = new PersonOrderHasBookDTO();
+            temp.setOrderId(personOrder.getOrderId().toString());
             pw.println("<h1> bookId = " + book.getBookId() + "</h1>");
+            temp.setBookId(book.getBookId().toString());
             pw.println("<h1> bookCount = " + book.getBookCount() + "</h1>");
+            temp.setBookCount(book.getBookCount());
+            bookArr[bookCounter] = temp;
+            bookCounter++;
             pw.println("<h1>---------------------------</h1>");
         }
+        personOrderDTO.setBooks(bookArr);
+        pw.println("<h1> As JSON = " + jsonSerializer.serialize(personOrderDTO) + "</h1>");
         pw.println("</html>");
     }
 }

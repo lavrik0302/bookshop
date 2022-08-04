@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
 @Data
 @NoArgsConstructor
 public class PersonOrderDTO {
@@ -14,5 +15,5 @@ public class PersonOrderDTO {
     private String personId;
     private String adress;
     private Integer statusId;
-    private BookDTO[] books;
+    private PersonOrderHasBookDTO[] books;
 }

@@ -20,10 +20,12 @@ public class UpdatePersonOrderRequest {
         setPersonIds(personId);
         return this;
     }
+
     public UpdatePersonOrderRequest setAdress(String adress) {
         setAdresses(adress);
         return this;
     }
+
     public UpdatePersonOrderRequest setStatusId(int statusId) {
         setStatusIds(statusId);
         return this;

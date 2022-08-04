@@ -1,8 +1,6 @@
 package com.intexsoft.controler.dao;
 
 
-
-
 import com.intexsoft.controler.findRequest.FindPersonRequest;
 import com.intexsoft.controler.updateRequest.UpdatePersonRequest;
 import com.intexsoft.model.Book;
@@ -30,7 +28,7 @@ public class PersonDAO {
             person.setName(name);
             person.setSurname(surname);
             person.setMobilenumber(mobileNumber);
-            preparedStatement=connection.prepareStatement("insert into person values (?, ?, ?, ?)");
+            preparedStatement = connection.prepareStatement("insert into person values (?, ?, ?, ?)");
             preparedStatement.setObject(1, uuid);
             preparedStatement.setString(2, name);
             preparedStatement.setString(3, surname);
@@ -46,7 +44,7 @@ public class PersonDAO {
     public Person createPerson(Person person) {
         PreparedStatement preparedStatement;
         try {
-            preparedStatement=connection.prepareStatement("insert into person values (?, ?, ?, ?)");
+            preparedStatement = connection.prepareStatement("insert into person values (?, ?, ?, ?)");
             preparedStatement.setObject(1, person.getPersonId());
             preparedStatement.setString(2, person.getName());
             preparedStatement.setString(3, person.getSurname());
@@ -377,8 +375,9 @@ public class PersonDAO {
             System.out.println(e);
         }
     }
+
     public String toSQLStringStatement(FindPersonRequest findPersonRequest) {
-        StringBuilder sb=new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         if (!findPersonRequest.getPersonIds().isEmpty()) {
             sb.append("person_id ");
             if (findPersonRequest.getPersonIds().size() > 1) {
@@ -422,7 +421,7 @@ public class PersonDAO {
             sb.append("mobilenumber ");
             if (findPersonRequest.getPersonMobilenumbers().size() > 1) {
                 sb.append("in (");
-                for (String mobilenumber :findPersonRequest.getPersonMobilenumbers()) {
+                for (String mobilenumber : findPersonRequest.getPersonMobilenumbers()) {
                     sb.append("'").append(mobilenumber).append("', ");
                 }
                 sb.deleteCharAt(sb.lastIndexOf(","));
@@ -435,6 +434,7 @@ public class PersonDAO {
         sb.append(";");
         return sb.toString();
     }
+
     public PersonDAO(Connection connection) {
         this.connection = connection;
     }

@@ -15,10 +15,10 @@ public class FindBookRequest {
     private List<UUID> bookIds = new ArrayList<>();
     private List<String> bookBooknames = new ArrayList<>();
     private List<String> bookAuthors = new ArrayList<>();
-    private BookFromToCostInByns bookFromToCostInByns=new BookFromToCostInByns();
+    private BookFromToCostInByns bookFromToCostInByns = new BookFromToCostInByns();
     private Integer bookCostInByns;
     private Integer bookCountInStocks;
-    private BookFromToCountInStocks bookFromToCountInStocks=new BookFromToCountInStocks();
+    private BookFromToCountInStocks bookFromToCountInStocks = new BookFromToCountInStocks();
 
     public FindBookRequest setBookId(UUID book_id) {
         getBookIds().add(book_id);

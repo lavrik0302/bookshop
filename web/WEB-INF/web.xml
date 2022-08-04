@@ -24,7 +24,7 @@
         <servlet-name>PersonOrderServlet</servlet-name>
         <servlet-class>com.intexsoft.servlets.PersonOrderServlet</servlet-class>
     </servlet>
-    
+
     <servlet-mapping>
         <servlet-name>BookInCart</servlet-name>
         <url-pattern>/bookInCart</url-pattern>
@@ -37,10 +37,10 @@
         <servlet-name>PersonServlet</servlet-name>
         <url-pattern>/person</url-pattern>
     </servlet-mapping>
-<servlet-mapping>
-    <servlet-name>BookServlet</servlet-name>
-    <url-pattern>/book</url-pattern>
-</servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>BookServlet</servlet-name>
+        <url-pattern>/book</url-pattern>
+    </servlet-mapping>
     <servlet-mapping>
         <servlet-name>PersonOrderServlet</servlet-name>
         <url-pattern>/personOrder</url-pattern>

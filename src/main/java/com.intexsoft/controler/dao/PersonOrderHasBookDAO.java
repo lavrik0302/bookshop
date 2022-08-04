@@ -1,7 +1,6 @@
 package com.intexsoft.controler.dao;
 
 
-
 import com.intexsoft.controler.findRequest.FindPersonOrderHasBookRequest;
 import com.intexsoft.controler.updateRequest.UpdatePersonOrderHasBookRequest;
 import com.intexsoft.model.PersonOrderHasBook;
@@ -24,10 +23,10 @@ public class PersonOrderHasBookDAO {
             personOrderHasBook.setOrderId(orderId);
             personOrderHasBook.setBookId(bookId);
             personOrderHasBook.setBookCount(bookCount);
-            preparedStatement=connection.prepareStatement("insert into person_order_has_book values (?, ?, ?)");
+            preparedStatement = connection.prepareStatement("insert into person_order_has_book values (?, ?, ?)");
             preparedStatement.setObject(1, orderId);
             preparedStatement.setObject(2, bookId);
-            preparedStatement.setInt(3,bookCount);
+            preparedStatement.setInt(3, bookCount);
             preparedStatement.executeUpdate();
 
             System.out.println("Insert success");
@@ -40,10 +39,10 @@ public class PersonOrderHasBookDAO {
     public PersonOrderHasBook createPersonOrderHasBook(PersonOrderHasBook personOrderHasBook) {
         PreparedStatement preparedStatement;
         try {
-            preparedStatement=connection.prepareStatement("insert into person_order_has_book values (?, ?, ?)");
+            preparedStatement = connection.prepareStatement("insert into person_order_has_book values (?, ?, ?)");
             preparedStatement.setObject(1, personOrderHasBook.getOrderId());
             preparedStatement.setObject(2, personOrderHasBook.getBookId());
-            preparedStatement.setInt(3,personOrderHasBook.getBookCount());
+            preparedStatement.setInt(3, personOrderHasBook.getBookCount());
             preparedStatement.executeUpdate();
             System.out.println("Insert success");
         } catch (Exception e) {
@@ -143,6 +142,7 @@ public class PersonOrderHasBookDAO {
             System.out.println(e);
         }
     }
+
     public String toSQLStringStatement(FindPersonOrderHasBookRequest findPersonOrderHasBookRequest) {
         StringBuilder sb = new StringBuilder();
         if (!findPersonOrderHasBookRequest.getOrderIds().isEmpty()) {
@@ -188,6 +188,7 @@ public class PersonOrderHasBookDAO {
         sb.append(";");
         return sb.toString();
     }
+
     public PersonOrderHasBookDAO(Connection connection) {
         this.connection = connection;
     }

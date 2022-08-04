@@ -5,11 +5,12 @@ import lombok.Data;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
 @Data
 public class FindPersonOrderHasBookRequest {
     private List<UUID> orderIds = new ArrayList<>();
     private List<UUID> bookIds = new ArrayList<>();
-    private List<Integer> bookCounts=new ArrayList<>();
+    private List<Integer> bookCounts = new ArrayList<>();
 
     public FindPersonOrderHasBookRequest setOrderId(UUID cartId) {
         orderIds.add(cartId);

@@ -1,7 +1,6 @@
 package com.intexsoft.controler.dao;
 
 
-
 import com.intexsoft.controler.findRequest.FindCartHasBookRequest;
 import com.intexsoft.controler.updateRequest.UpdateCartHasBookRequest;
 import com.intexsoft.model.CartHasBook;
@@ -142,6 +141,7 @@ public class CartHasBookDAO {
             System.out.println(e);
         }
     }
+
     public String toSQLStringStatement(FindCartHasBookRequest findCartHasBookRequest) {
         StringBuilder sb = new StringBuilder();
         if (!findCartHasBookRequest.getCartIds().isEmpty()) {
@@ -187,6 +187,7 @@ public class CartHasBookDAO {
         sb.append(";");
         return sb.toString();
     }
+
     public CartHasBookDAO(Connection connection) {
         this.connection = connection;
     }

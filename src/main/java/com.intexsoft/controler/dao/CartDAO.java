@@ -1,10 +1,6 @@
 package com.intexsoft.controler.dao;
 
 
-
-
-
-
 import com.intexsoft.controler.findRequest.FindCartRequest;
 import com.intexsoft.controler.updateRequest.UpdateCartRequest;
 import com.intexsoft.model.Book;
@@ -193,8 +189,9 @@ public class CartDAO {
             System.out.println(e);
         }
     }
-    public String toSQLStringStatement(FindCartRequest findCartRequest){
-        StringBuilder sb =new StringBuilder();
+
+    public String toSQLStringStatement(FindCartRequest findCartRequest) {
+        StringBuilder sb = new StringBuilder();
         if (findCartRequest.getCartId() != null) {
             sb.append("cart_id ");
             sb.append("='").append(findCartRequest.getCartId()).append("' AND ");

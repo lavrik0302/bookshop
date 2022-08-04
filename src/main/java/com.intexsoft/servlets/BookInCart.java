@@ -29,7 +29,7 @@ public class BookInCart extends HttpServlet {
     CartHasBookDAO cartHasBookDAO = new CartHasBookDAO(connection);
     BookDAO bookDAO = new BookDAO(connection);
     Mapper mapper = new Mapper();
-    JsonSerializer jsonSerializer=new JsonSerializer();
+    JsonSerializer jsonSerializer = new JsonSerializer();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -37,15 +37,15 @@ public class BookInCart extends HttpServlet {
         PrintWriter pw = response.getWriter();
         UUID uuid = UUID.fromString(stringUUId);
         List<CartHasBook> list = cartHasBookDAO.find(new FindCartHasBookRequest().setCartId(uuid));
-        CartHasBookDTO [] cartHasBookDTOarr=new CartHasBookDTO[list.size()];
+        CartHasBookDTO[] cartHasBookDTOarr = new CartHasBookDTO[list.size()];
         pw.println("<html>");
-        int cartHasBookCounter=0;
+        int cartHasBookCounter = 0;
         for (CartHasBook cur : list) {
-            CartHasBookDTO cartHasBookDTO=new CartHasBookDTO();
+            CartHasBookDTO cartHasBookDTO = new CartHasBookDTO();
             cartHasBookDTO.setCartId(cur.getCartId().toString());
             cartHasBookDTO.setBookId(cur.getBookId().toString());
             cartHasBookDTO.setBookCount(cur.getBookCount());
-            cartHasBookDTOarr[cartHasBookCounter]=cartHasBookDTO;
+            cartHasBookDTOarr[cartHasBookCounter] = cartHasBookDTO;
             pw.println("<h1> bookId = " + cur.getBookId() + "</h1>");
             Book book = bookDAO.find(new FindBookRequest().setBookId(cur.getBookId())).get(0);
             pw.println("<h1> bookname = " + book.getBookname() + "</h1>");
@@ -55,7 +55,7 @@ public class BookInCart extends HttpServlet {
             pw.println("<h1> -----------------------</h1>");
             cartHasBookCounter++;
         }
-        pw.println("<h1> As Json = " +jsonSerializer.serialize(cartHasBookDTOarr)+ "</h1>");
+        pw.println("<h1> As JSON= " + jsonSerializer.serialize(cartHasBookDTOarr) + "</h1>");
         pw.println("</html>");
     }
 
@@ -74,7 +74,7 @@ public class BookInCart extends HttpServlet {
         pw.println("<h1> cartId = " + cartHasBookDTO.getCartId() + "</h1>");
         pw.println("<h1> bookId = " + cartHasBookDTO.getBookId() + "</h1>");
         pw.println("<h1> bookCount = " + cartHasBookDTO.getBookCount() + "</h1>");
-        pw.println("<h1> As Json = " + jsonSerializer.serialize(cartHasBookDTO) + "</h1>");
+        pw.println("<h1> As JSON = " + jsonSerializer.serialize(cartHasBookDTO) + "</h1>");
         pw.println("</html>");
     }
 }

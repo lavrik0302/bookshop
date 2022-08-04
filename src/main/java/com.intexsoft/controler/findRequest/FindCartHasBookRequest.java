@@ -10,7 +10,7 @@ import java.util.UUID;
 public class FindCartHasBookRequest {
     private List<UUID> cartIds = new ArrayList<>();
     private List<UUID> bookIds = new ArrayList<>();
-    private List<Integer> bookCounts=new ArrayList<>();
+    private List<Integer> bookCounts = new ArrayList<>();
 
     public FindCartHasBookRequest setCartId(UUID cartId) {
         cartIds.add(cartId);

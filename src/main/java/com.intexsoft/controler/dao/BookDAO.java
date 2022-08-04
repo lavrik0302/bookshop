@@ -1,7 +1,6 @@
 package com.intexsoft.controler.dao;
 
 
-
 import com.intexsoft.controler.findRequest.FindBookRequest;
 import com.intexsoft.controler.updateRequest.UpdateBookRequest;
 import com.intexsoft.model.Book;
@@ -157,6 +156,7 @@ public class BookDAO {
             System.out.println(e);
         }
     }
+
     public String toSQLStringStatement(FindBookRequest findBookRequest) {
         StringBuilder sb = new StringBuilder();
         if (!findBookRequest.getBookIds().isEmpty()) {
@@ -198,7 +198,7 @@ public class BookDAO {
                 sb.append("='").append(findBookRequest.getBookAuthors().get(0)).append("' AND ");
             }
         }
-        if (findBookRequest.getBookFromToCostInByns().getFrom()!= null) {
+        if (findBookRequest.getBookFromToCostInByns().getFrom() != null) {
             sb.append("cost_in_byn ");
 
             sb.append(">='").append(findBookRequest.getBookFromToCostInByns().getFrom()).append("' AND ");

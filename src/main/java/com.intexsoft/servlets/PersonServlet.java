@@ -3,12 +3,11 @@ package com.intexsoft.servlets;
 import com.intexsoft.controler.ConnectToDb;
 import com.intexsoft.controler.dao.CartDAO;
 import com.intexsoft.controler.dao.PersonDAO;
+import com.intexsoft.controler.dao.PersonOrderHasBookDAO;
 import com.intexsoft.controler.findRequest.FindCartRequest;
+import com.intexsoft.controler.findRequest.FindPersonOrderHasBookRequest;
 import com.intexsoft.controler.findRequest.FindPersonRequest;
-import com.intexsoft.model.Book;
-import com.intexsoft.model.Cart;
-import com.intexsoft.model.Person;
-import com.intexsoft.model.PersonOrder;
+import com.intexsoft.model.*;
 import com.intexsoft.model.transfer.*;
 import com.intexsoft.parser.JsonDeserializer;
 import com.intexsoft.parser.Mapper;
@@ -33,7 +32,7 @@ public class PersonServlet extends HttpServlet {
     JsonSerializer jsonSerializer = new JsonSerializer();
     Mapper mapper = new Mapper();
     CartDAO cartDAO = new CartDAO(connection);
-
+    PersonOrderHasBookDAO personOrderHasBookDAO = new PersonOrderHasBookDAO(connection);
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -62,16 +61,14 @@ public class PersonServlet extends HttpServlet {
             personOrderDTO.setAdress(personOrder.getAdress());
             personOrderDTO.setStatusId(personOrder.getStatusId());
             int numberOfBooks = person.getPersonOrders().get(orderCounter).getBooks().size();
-            BookDTO[] bookDTOList = new BookDTO[numberOfBooks];
+            PersonOrderHasBookDTO[] bookDTOList = new PersonOrderHasBookDTO[numberOfBooks];
             int bookCounter = 0;
-            for (Book book : person.getPersonOrders().get(orderCounter).getBooks()) {
-                BookDTO bookDTO = new BookDTO();
-                bookDTO.setBookId(book.getBookId().toString());
-                bookDTO.setBookname(book.getBookname());
-                bookDTO.setAuthor(book.getAuthor());
-                bookDTO.setCostInByn(book.getCostInByn());
-                bookDTO.setCountInStock(book.getCountInStock());
-                bookDTOList[bookCounter] = bookDTO;
+            for (PersonOrderHasBook personOrderHasBook : personOrderHasBookDAO.find(new FindPersonOrderHasBookRequest().setOrderId(personOrder.getOrderId()))) {
+                PersonOrderHasBookDTO personOrderHasBookDTO = new PersonOrderHasBookDTO();
+                personOrderHasBookDTO.setOrderId(personOrderHasBook.getOrderId().toString());
+                personOrderHasBookDTO.setBookId(personOrderHasBook.getBookId().toString());
+                personOrderHasBookDTO.setBookCount(personOrderHasBook.getBookCount());
+                bookDTOList[bookCounter] = personOrderHasBookDTO;
                 bookCounter++;
             }
             personOrderDTO.setBooks(bookDTOList);
@@ -103,7 +100,7 @@ public class PersonServlet extends HttpServlet {
         }
         JsonDeserializer jsonDeserializer = new JsonDeserializer(sb.toString());
 
-        PesronInfoDTO pesronInfoDTO= mapper.map(jsonDeserializer.parseValue(), PesronInfoDTO.class);
+        PesronInfoDTO pesronInfoDTO = mapper.map(jsonDeserializer.parseValue(), PesronInfoDTO.class);
         Person person = personDAO.createRow(pesronInfoDTO.getName(), pesronInfoDTO.getSurname(), pesronInfoDTO.getMobilenumber());
         String cartname = person.getSurname() + " cart";
         cartDAO.createRow(person.getPersonId(), cartname);
@@ -112,7 +109,7 @@ public class PersonServlet extends HttpServlet {
         pw.println("<h1> name = " + person.getName() + "</h1>");
         pw.println("<h1> surname = " + person.getSurname() + "</h1>");
         pw.println("<h1> mobileNumber = " + person.getMobilenumber() + "</h1>");
-        pw.println("<h1> As Json = " + jsonSerializer.serialize(pesronInfoDTO) + "</h1>");
+        pw.println("<h1> As JSON = " + jsonSerializer.serialize(pesronInfoDTO) + "</h1>");
         pw.println("</html>");
 
 

@@ -1,8 +1,6 @@
 package com.intexsoft.controler.dao;
 
 
-
-
 import com.intexsoft.controler.findRequest.FindPersonOrderRequest;
 import com.intexsoft.controler.updateRequest.UpdatePersonOrderRequest;
 import com.intexsoft.model.Book;
@@ -29,7 +27,7 @@ public class PersonOrderDAO {
             personOrder.setPersonId(personId);
             personOrder.setAdress(adress);
             personOrder.setStatusId(statusId);
-            preparedStatement=connection.prepareStatement("insert into person_order values(?, ?, ?, ?)");
+            preparedStatement = connection.prepareStatement("insert into person_order values(?, ?, ?, ?)");
             preparedStatement.setObject(1, uuid);
             preparedStatement.setObject(2, personId);
             preparedStatement.setString(3, adress);
@@ -45,7 +43,7 @@ public class PersonOrderDAO {
     public PersonOrder createPersonOrder(PersonOrder personOrder) {
         PreparedStatement preparedStatement;
         try {
-            preparedStatement=connection.prepareStatement("insert into person_order values(?, ?, ?, ?)");
+            preparedStatement = connection.prepareStatement("insert into person_order values(?, ?, ?, ?)");
             preparedStatement.setObject(1, personOrder.getOrderId());
             preparedStatement.setObject(2, personOrder.getPersonId());
             preparedStatement.setString(3, personOrder.getAdress());
@@ -206,8 +204,9 @@ public class PersonOrderDAO {
             System.out.println(e);
         }
     }
-    public String toSQLStringStatement(FindPersonOrderRequest findPersonOrderRequest){
-        StringBuilder sb =new StringBuilder();
+
+    public String toSQLStringStatement(FindPersonOrderRequest findPersonOrderRequest) {
+        StringBuilder sb = new StringBuilder();
         if (findPersonOrderRequest.getOrderIds() != null) {
             sb.append("po.order_id ");
             sb.append("='").append(findPersonOrderRequest.getOrderIds()).append("' AND ");

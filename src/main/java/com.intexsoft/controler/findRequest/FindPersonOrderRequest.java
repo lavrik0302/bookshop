@@ -20,10 +20,12 @@ public class FindPersonOrderRequest {
         setPersonIds(personId);
         return this;
     }
+
     public FindPersonOrderRequest setAdress(String adress) {
         setAdresses(adress);
         return this;
     }
+
     public FindPersonOrderRequest setStatusId(int statusId) {
         setStatusIds(statusId);
         return this;
