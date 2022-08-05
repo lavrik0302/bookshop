@@ -9,7 +9,7 @@ public class ConnectToDb {
         Connection connection = null;
         try {
             Class.forName("org.postgresql.Driver");
-            connection = DriverManager.getConnection("jdbc:postgresql://localhost:55000/" + dbname, username, password);
+            connection = DriverManager.getConnection("jdbc:postgresql://localhost:55002/" + dbname, username, password);
             if (connection != null) {
                 System.out.println("Connection established");
             } else {
