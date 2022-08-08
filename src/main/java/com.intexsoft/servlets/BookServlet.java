@@ -47,7 +47,6 @@ public class BookServlet extends HttpServlet {
             bookDTO.setAuthor(book.getAuthor());
             bookDTO.setCostInByn(book.getCostInByn());
             bookDTO.setCountInStock(book.getCountInStock());
-
             String json = jsonSerializer.serialize(bookDTO);
             pw.println("<html>");
             pw.println("<h1> book_id = " + book.getBookId() + "</h1>");

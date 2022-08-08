@@ -146,6 +146,7 @@ public class PersonOrderDAO {
             System.out.println("Used connection: " + connection);
             statement = connection.createStatement();
             rs = statement.executeQuery(sb.toString());
+            Thread.sleep(5000);
             ConnectionPool.getInstance().releaseConnection(connection);
             while (rs.next()) {
                 personOrder.setOrderId(rs.getObject("order_id", UUID.class));

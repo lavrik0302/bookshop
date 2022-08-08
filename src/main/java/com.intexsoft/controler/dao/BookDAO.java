@@ -96,7 +96,6 @@ public class BookDAO {
         Statement statement;
         List<Book> list = new ArrayList<>();
         ResultSet rs = null;
-        System.out.println("start of find");
         try {
             StringBuilder sb = new StringBuilder();
             sb.append("select * from book where ");
@@ -106,7 +105,9 @@ public class BookDAO {
             System.out.println("Used connection: " + connection);
             statement = connection.createStatement();
             rs = statement.executeQuery(sb.toString());
-            ConnectionPool.getInstance().releaseConnection(connection);
+            Thread.sleep(5000);
+
+          ConnectionPool.getInstance().releaseConnection(connection);
             while (rs.next()) {
                 Book book = new Book();
                 book.setBookId(rs.getObject("book_id", UUID.class));
