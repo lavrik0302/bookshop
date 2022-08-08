@@ -28,17 +28,25 @@ public class ConnectionPool {
         usedConnections = new ArrayList<>(CONNECTION_POOL_SIZE);
     }
 
-    private static ConnectionPool instance = null;
+    private static volatile ConnectionPool instance = null;
+    private static Object mutex = new Object();
 
-    public static synchronized ConnectionPool getInstance() throws SQLException {
-        if (instance == null) {
-            instance = new ConnectionPool("jdbc:postgresql://localhost:55000/bookshop", "postgres", "postgrespw");
+    public static ConnectionPool getInstance() throws SQLException {
+        ConnectionPool result = instance;
+        if (result == null) {
+
+            synchronized (mutex) {
+                result = instance;
+                if (result == null) {
+                    instance = result  = new ConnectionPool("jdbc:postgresql://localhost:55000/bookshop", "postgres", "postgrespw");
+                }
+            }
         }
-        return instance;
+        return result;
     }
 
 
-    public Connection getConnection() throws SQLException, InterruptedException {
+    public synchronized Connection getConnection() throws SQLException, InterruptedException {
         Connection connection = null;
         if (ConnectionPool.getInstance().connectionPool.isEmpty()) {
             if (ConnectionPool.getInstance().usedConnections.size() == CONNECTION_POOL_MAX_SIZE) {
@@ -65,12 +73,12 @@ public class ConnectionPool {
         return connection;
     }
 
-
     public boolean releaseConnection(Connection connection) {
-        boolean contains=false;
+        boolean contains = false;
+
         if (usedConnections.contains(connection)) {
             connectionPool.add(connection);
-            contains=usedConnections.remove(connection);
+            contains = usedConnections.remove(connection);
         }
         return contains;
     }
