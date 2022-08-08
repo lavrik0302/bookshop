@@ -19,6 +19,7 @@
     <servlet>
         <servlet-name>BookServlet</servlet-name>
         <servlet-class>com.intexsoft.servlets.BookServlet</servlet-class>
+
     </servlet>
     <servlet>
         <servlet-name>PersonOrderServlet</servlet-name>
@@ -45,4 +46,6 @@
         <servlet-name>PersonOrderServlet</servlet-name>
         <url-pattern>/personOrder</url-pattern>
     </servlet-mapping>
+
+
 </web-app>

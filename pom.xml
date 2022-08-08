@@ -12,6 +12,7 @@
     <name>Archetype - crud</name>
     <url>http://maven.apache.org</url>
     <dependencies>
+
         <dependency>
             <groupId>com.intexsoft</groupId>
             <artifactId>parser</artifactId>

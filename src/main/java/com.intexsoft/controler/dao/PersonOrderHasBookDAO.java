@@ -1,6 +1,7 @@
 package com.intexsoft.controler.dao;
 
 
+import com.intexsoft.controler.ConnectionPool;
 import com.intexsoft.controler.findRequest.FindPersonOrderHasBookRequest;
 import com.intexsoft.controler.updateRequest.UpdatePersonOrderHasBookRequest;
 import com.intexsoft.model.PersonOrderHasBook;
@@ -23,11 +24,14 @@ public class PersonOrderHasBookDAO {
             personOrderHasBook.setOrderId(orderId);
             personOrderHasBook.setBookId(bookId);
             personOrderHasBook.setBookCount(bookCount);
+            connection = ConnectionPool.getInstance().getConnection();
+            System.out.println("Used connection: " + connection);
             preparedStatement = connection.prepareStatement("insert into person_order_has_book values (?, ?, ?)");
             preparedStatement.setObject(1, orderId);
             preparedStatement.setObject(2, bookId);
             preparedStatement.setInt(3, bookCount);
             preparedStatement.executeUpdate();
+            ConnectionPool.getInstance().releaseConnection(connection);
 
             System.out.println("Insert success");
         } catch (Exception e) {
@@ -39,11 +43,14 @@ public class PersonOrderHasBookDAO {
     public PersonOrderHasBook createPersonOrderHasBook(PersonOrderHasBook personOrderHasBook) {
         PreparedStatement preparedStatement;
         try {
+            connection = ConnectionPool.getInstance().getConnection();
+            System.out.println("Used connection: " + connection);
             preparedStatement = connection.prepareStatement("insert into person_order_has_book values (?, ?, ?)");
             preparedStatement.setObject(1, personOrderHasBook.getOrderId());
             preparedStatement.setObject(2, personOrderHasBook.getBookId());
             preparedStatement.setInt(3, personOrderHasBook.getBookCount());
             preparedStatement.executeUpdate();
+            ConnectionPool.getInstance().releaseConnection(connection);
             System.out.println("Insert success");
         } catch (Exception e) {
             System.out.println(e);
@@ -51,14 +58,17 @@ public class PersonOrderHasBookDAO {
         return personOrderHasBook;
     }
 
-    public List<PersonOrderHasBook> findAll(Connection connection) {
+    public List<PersonOrderHasBook> findAll() {
         List<PersonOrderHasBook> list = new ArrayList<>();
         Statement statement;
         ResultSet rs = null;
         try {
             String query = "select * from person_order_has_book";
+            connection = ConnectionPool.getInstance().getConnection();
+            System.out.println("Used connection: " + connection);
             statement = connection.createStatement();
             rs = statement.executeQuery(query);
+            ConnectionPool.getInstance().releaseConnection(connection);
             while (rs.next()) {
                 PersonOrderHasBook personOrderHasBook = new PersonOrderHasBook();
                 personOrderHasBook.setOrderId(rs.getObject("order_id", UUID.class));
@@ -81,8 +91,11 @@ public class PersonOrderHasBookDAO {
             sb.append("select * from person_order_has_book where ");
             sb.append(toSQLStringStatement(findPersonOrderHasBookRequest));
             System.out.println(sb.toString());
+            connection = ConnectionPool.getInstance().getConnection();
+            System.out.println("Used connection: " + connection);
             statement = connection.createStatement();
             rs = statement.executeQuery(sb.toString());
+            ConnectionPool.getInstance().releaseConnection(connection);
             while (rs.next()) {
                 PersonOrderHasBook personOrderHasBook = new PersonOrderHasBook();
                 personOrderHasBook.setOrderId(rs.getObject("order_id", UUID.class));
@@ -112,8 +125,11 @@ public class PersonOrderHasBookDAO {
             sb.append("where ");
             sb.append(toSQLStringStatement(findPersonOrderHasBookRequest));
             System.out.println(sb.toString());
+            connection = ConnectionPool.getInstance().getConnection();
+            System.out.println("Used connection: " + connection);
             statement = connection.createStatement();
             statement.executeUpdate(sb.toString());
+            ConnectionPool.getInstance().releaseConnection(connection);
             System.out.println("Data updated");
         } catch (Exception e) {
             System.out.println(e);
@@ -135,8 +151,11 @@ public class PersonOrderHasBookDAO {
             sb.append("delete from person_order_has_book where ");
             sb.append(toSQLStringStatement(findPersonOrderHasBookRequest));
             System.out.println(sb.toString());
+            connection = ConnectionPool.getInstance().getConnection();
+            System.out.println("Used connection: " + connection);
             statement = connection.createStatement();
             statement.executeUpdate(sb.toString());
+            ConnectionPool.getInstance().releaseConnection(connection);
             System.out.println("Data deleted");
         } catch (Exception e) {
             System.out.println(e);
@@ -189,7 +208,4 @@ public class PersonOrderHasBookDAO {
         return sb.toString();
     }
 
-    public PersonOrderHasBookDAO(Connection connection) {
-        this.connection = connection;
-    }
 }

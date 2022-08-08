@@ -1,6 +1,7 @@
 package com.intexsoft.controler.dao;
 
 
+import com.intexsoft.controler.ConnectionPool;
 import com.intexsoft.controler.findRequest.FindPersonOrderRequest;
 import com.intexsoft.controler.updateRequest.UpdatePersonOrderRequest;
 import com.intexsoft.model.Book;
@@ -27,12 +28,15 @@ public class PersonOrderDAO {
             personOrder.setPersonId(personId);
             personOrder.setAdress(adress);
             personOrder.setStatusId(statusId);
+            connection = ConnectionPool.getInstance().getConnection();
+            System.out.println("Used connection: " + connection);
             preparedStatement = connection.prepareStatement("insert into person_order values(?, ?, ?, ?)");
             preparedStatement.setObject(1, uuid);
             preparedStatement.setObject(2, personId);
             preparedStatement.setString(3, adress);
             preparedStatement.setInt(4, statusId);
             preparedStatement.executeUpdate();
+            ConnectionPool.getInstance().releaseConnection(connection);
             System.out.println("Insert success");
         } catch (Exception e) {
             System.out.println(e);
@@ -43,12 +47,15 @@ public class PersonOrderDAO {
     public PersonOrder createPersonOrder(PersonOrder personOrder) {
         PreparedStatement preparedStatement;
         try {
+            connection = ConnectionPool.getInstance().getConnection();
+            System.out.println("Used connection: " + connection);
             preparedStatement = connection.prepareStatement("insert into person_order values(?, ?, ?, ?)");
             preparedStatement.setObject(1, personOrder.getOrderId());
             preparedStatement.setObject(2, personOrder.getPersonId());
             preparedStatement.setString(3, personOrder.getAdress());
             preparedStatement.setInt(4, personOrder.getStatusId());
             preparedStatement.executeUpdate();
+            ConnectionPool.getInstance().releaseConnection(connection);
             System.out.println("Insert success");
         } catch (Exception e) {
             System.out.println(e);
@@ -62,8 +69,11 @@ public class PersonOrderDAO {
         ResultSet rs = null;
         try {
             String query = "select * from person_order";
+            connection = ConnectionPool.getInstance().getConnection();
+            System.out.println("Used connection: " + connection);
             statement = connection.createStatement();
             rs = statement.executeQuery(query);
+            ConnectionPool.getInstance().releaseConnection(connection);
             while (rs.next()) {
                 PersonOrder personOrder = new PersonOrder();
                 personOrder.setOrderId(rs.getObject("order_id", UUID.class));
@@ -88,8 +98,11 @@ public class PersonOrderDAO {
             sb.append("select * from person_order where ");
             sb.append(toSQLStringStatement(findPersonOrderRequest));
             System.out.println(sb.toString());
+            connection = ConnectionPool.getInstance().getConnection();
+            System.out.println("Used connection: " + connection);
             statement = connection.createStatement();
             rs = statement.executeQuery(sb.toString());
+            ConnectionPool.getInstance().releaseConnection(connection);
             while (rs.next()) {
                 personOrder.setOrderId(rs.getObject("order_id", UUID.class));
                 personOrder.setPersonId(rs.getObject("person_id", UUID.class));
@@ -129,8 +142,11 @@ public class PersonOrderDAO {
             sb.delete(sb.length() - 4, sb.length());
             sb.append(";");
             System.out.println(sb.toString());
+            connection = ConnectionPool.getInstance().getConnection();
+            System.out.println("Used connection: " + connection);
             statement = connection.createStatement();
             rs = statement.executeQuery(sb.toString());
+            ConnectionPool.getInstance().releaseConnection(connection);
             while (rs.next()) {
                 personOrder.setOrderId(rs.getObject("order_id", UUID.class));
                 personOrder.setPersonId(rs.getObject("person_id", UUID.class));
@@ -174,8 +190,11 @@ public class PersonOrderDAO {
             sb.append("where ");
             sb.append(toSQLStringStatement(findPersonOrderRequest));
             System.out.println(sb.toString());
+            connection = ConnectionPool.getInstance().getConnection();
+            System.out.println("Used connection: " + connection);
             statement = connection.createStatement();
             statement.executeUpdate(sb.toString());
+            ConnectionPool.getInstance().releaseConnection(connection);
             System.out.println("Data updated");
         } catch (Exception e) {
             System.out.println(e);
@@ -197,8 +216,11 @@ public class PersonOrderDAO {
             sb.append("delete from person_order where ");
             sb.append(toSQLStringStatement(findPersonOrderRequest));
             System.out.println(sb.toString());
+            connection = ConnectionPool.getInstance().getConnection();
+            System.out.println("Used connection: " + connection);
             statement = connection.createStatement();
             statement.executeUpdate(sb.toString());
+            ConnectionPool.getInstance().releaseConnection(connection);
             System.out.println("Data deleted");
         } catch (Exception e) {
             System.out.println(e);
@@ -226,9 +248,5 @@ public class PersonOrderDAO {
         sb.delete(sb.length() - 4, sb.length());
         sb.append(";");
         return sb.toString();
-    }
-
-    public PersonOrderDAO(Connection connection) {
-        this.connection = connection;
     }
 }

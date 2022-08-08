@@ -1,6 +1,7 @@
 package com.intexsoft.controler.dao;
 
 
+import com.intexsoft.controler.ConnectionPool;
 import com.intexsoft.controler.findRequest.FindCartRequest;
 import com.intexsoft.controler.updateRequest.UpdateCartRequest;
 import com.intexsoft.model.Book;
@@ -25,11 +26,14 @@ public class CartDAO {
             cart.setCartId(uuid);
             cart.setPersonId(personId);
             cart.setCartname(cartname);
+            connection = ConnectionPool.getInstance().getConnection();
+            System.out.println("Used connection: " + connection);
             preparedStatement = connection.prepareStatement("insert into cart values (?, ?, ?)");
             preparedStatement.setObject(1, uuid);
             preparedStatement.setObject(2, personId);
             preparedStatement.setString(3, cartname);
             preparedStatement.executeUpdate();
+            ConnectionPool.getInstance().releaseConnection(connection);
             System.out.println("Insert success");
         } catch (Exception e) {
             System.out.println(e);
@@ -41,11 +45,14 @@ public class CartDAO {
     public Cart createCart(Cart cart) {
         PreparedStatement preparedStatement;
         try {
+            connection = ConnectionPool.getInstance().getConnection();
+            System.out.println("Used connection: " + connection);
             preparedStatement = connection.prepareStatement("insert into cart values (?, ?, ?)");
             preparedStatement.setObject(1, cart.getCartId());
             preparedStatement.setObject(2, cart.getPersonId());
             preparedStatement.setString(3, cart.getCartname());
             preparedStatement.executeUpdate();
+            ConnectionPool.getInstance().releaseConnection(connection);
             System.out.println("Insert success");
         } catch (Exception e) {
             System.out.println(e);
@@ -60,8 +67,11 @@ public class CartDAO {
         ResultSet rs = null;
         try {
             String query = "select * from cart";
+            connection = ConnectionPool.getInstance().getConnection();
+            System.out.println("Used connection: " + connection);
             statement = connection.createStatement();
             rs = statement.executeQuery(query);
+            ConnectionPool.getInstance().releaseConnection(connection);
             while (rs.next()) {
                 Cart cart = new Cart();
                 cart.setCartId(rs.getObject("cart_id", UUID.class));
@@ -82,12 +92,13 @@ public class CartDAO {
         try {
             StringBuilder sb = new StringBuilder();
             sb.append("select * from cart where ");
-
             sb.append(toSQLStringStatement(findCartRequest));
-
             System.out.println(sb.toString());
+            connection = ConnectionPool.getInstance().getConnection();
+            System.out.println("Used connection: " + connection);
             statement = connection.createStatement();
             rs = statement.executeQuery(sb.toString());
+            ConnectionPool.getInstance().releaseConnection(connection);
             while (rs.next()) {
                 cart.setCartId(rs.getObject("cart_id", UUID.class));
                 cart.setPersonId(rs.getObject("person_id", UUID.class));
@@ -121,9 +132,11 @@ public class CartDAO {
             sb.delete(sb.length() - 4, sb.length());
             sb.append(";");
             System.out.println(sb.toString());
+            connection = ConnectionPool.getInstance().getConnection();
+            System.out.println("Used connection: " + connection);
             statement = connection.createStatement();
             rs = statement.executeQuery(sb.toString());
-
+            ConnectionPool.getInstance().releaseConnection(connection);
             while (rs.next()) {
                 cart.setCartId(rs.getObject("cart_id", UUID.class));
                 cart.setPersonId(rs.getObject("person_id", UUID.class));
@@ -158,8 +171,11 @@ public class CartDAO {
             sb.append("where ");
             sb.append(toSQLStringStatement(findCartRequest));
             System.out.println(sb.toString());
+            connection = ConnectionPool.getInstance().getConnection();
+            System.out.println("Used connection: " + connection);
             statement = connection.createStatement();
             statement.executeUpdate(sb.toString());
+            ConnectionPool.getInstance().releaseConnection(connection);
             System.out.println("Data updated");
         } catch (Exception e) {
             System.out.println(e);
@@ -182,8 +198,11 @@ public class CartDAO {
 
             sb.append(toSQLStringStatement(findCartRequest));
             System.out.println(sb.toString());
+            connection = ConnectionPool.getInstance().getConnection();
+            System.out.println("Used connection: " + connection);
             statement = connection.createStatement();
             statement.executeUpdate(sb.toString());
+            ConnectionPool.getInstance().releaseConnection(connection);
             System.out.println("Data deleted");
         } catch (Exception e) {
             System.out.println(e);
@@ -209,7 +228,4 @@ public class CartDAO {
         return sb.toString();
     }
 
-    public CartDAO(Connection connection) {
-        this.connection = connection;
-    }
 }
