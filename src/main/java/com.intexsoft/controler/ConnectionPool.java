@@ -5,18 +5,18 @@ import lombok.Data;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.time.LocalDate;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Data
 public class ConnectionPool {
-    private static final int CONNECTION_POOL_SIZE = 1;
-    private static final int CONNECTION_POOL_MAX_SIZE = 2;
+    private static final int CONNECTION_POOL_SIZE = 5;
+    private static final int CONNECTION_POOL_MAX_SIZE = 10;
     private List<Connection> connectionPool;
     private List<Connection> usedConnections;
-
 
     private ConnectionPool(String url, String user, String password) throws SQLException {
         System.out.println("Starting of creation Connection Pool");
@@ -31,14 +31,15 @@ public class ConnectionPool {
     private static volatile ConnectionPool instance = null;
     private static Object mutex = new Object();
 
-    public static ConnectionPool getInstance() throws SQLException {
+    public static ConnectionPool getInstance() throws SQLException, InterruptedException {
         ConnectionPool result = instance;
         if (result == null) {
 
             synchronized (mutex) {
                 result = instance;
                 if (result == null) {
-                    instance = result  = new ConnectionPool("jdbc:postgresql://localhost:55000/bookshop", "postgres", "postgrespw");
+                    Thread.sleep(5000);
+                    instance = result = new ConnectionPool("jdbc:postgresql://localhost:55001/bookshop", "postgres", "postgrespw");
                 }
             }
         }

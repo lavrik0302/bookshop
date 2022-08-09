@@ -1,7 +1,5 @@
 package com.intexsoft.servlets;
 
-import com.intexsoft.controler.ConnectToDb;
-import com.intexsoft.controler.ConnectionPool;
 import com.intexsoft.controler.dao.BookDAO;
 import com.intexsoft.controler.dao.CartHasBookDAO;
 import com.intexsoft.controler.findRequest.FindBookRequest;
@@ -21,7 +19,6 @@ import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;

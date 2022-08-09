@@ -107,7 +107,7 @@ public class BookDAO {
             rs = statement.executeQuery(sb.toString());
             Thread.sleep(5000);
 
-          ConnectionPool.getInstance().releaseConnection(connection);
+            ConnectionPool.getInstance().releaseConnection(connection);
             while (rs.next()) {
                 Book book = new Book();
                 book.setBookId(rs.getObject("book_id", UUID.class));

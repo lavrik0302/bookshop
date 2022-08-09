@@ -1,6 +1,5 @@
 package com.intexsoft.servlets;
 
-import com.intexsoft.controler.ConnectToDb;
 import com.intexsoft.controler.dao.CartDAO;
 import com.intexsoft.controler.dao.PersonDAO;
 import com.intexsoft.controler.dao.PersonOrderHasBookDAO;
@@ -18,9 +17,10 @@ import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.Connection;
 import java.util.Arrays;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @WebServlet(name = "PersonServlet", value = "/PersonServlet")
 public class PersonServlet extends HttpServlet {
@@ -115,16 +115,25 @@ public class PersonServlet extends HttpServlet {
         try {
             JsonDeserializer jsonDeserializer = new JsonDeserializer(sb.toString());
             PesronInfoDTO pesronInfoDTO = mapper.map(jsonDeserializer.parseValue(), PesronInfoDTO.class);
-            Person person = personDAO.createRow(pesronInfoDTO.getName(), pesronInfoDTO.getSurname(), pesronInfoDTO.getMobilenumber());
-            String cartname = person.getSurname() + " cart";
-            cartDAO.createRow(person.getPersonId(), cartname);
-            pw.println("<html>");
-            pw.println("<h1> personId = " + person.getPersonId() + "</h1>");
-            pw.println("<h1> name = " + person.getName() + "</h1>");
-            pw.println("<h1> surname = " + person.getSurname() + "</h1>");
-            pw.println("<h1> mobileNumber = " + person.getMobilenumber() + "</h1>");
-            pw.println("<h1> As JSON = " + jsonSerializer.serialize(pesronInfoDTO) + "</h1>");
-            pw.println("</html>");
+            Pattern regexForMobilenumber = Pattern.compile("^(\\+375)(25|29|33|44)\\d{7}$");
+            Matcher matcher = regexForMobilenumber.matcher(pesronInfoDTO.getMobilenumber());
+            if (matcher.matches()) {
+                Person person = personDAO.createRow(pesronInfoDTO.getName(), pesronInfoDTO.getSurname(), pesronInfoDTO.getMobilenumber());
+                String cartname = person.getSurname() + " cart";
+                cartDAO.createRow(person.getPersonId(), cartname);
+                pw.println("<html>");
+                pw.println("<h1> personId = " + person.getPersonId() + "</h1>");
+                pw.println("<h1> name = " + person.getName() + "</h1>");
+                pw.println("<h1> surname = " + person.getSurname() + "</h1>");
+                pw.println("<h1> mobileNumber = " + person.getMobilenumber() + "</h1>");
+                pw.println("<h1> As JSON = " + jsonSerializer.serialize(pesronInfoDTO) + "</h1>");
+                pw.println("</html>");
+            }else {
+                pw.println("<html>");
+                pw.println("<h1> Invalid Mobile Number. Please try again.</h1>");
+                response.setStatus(400);
+                pw.println("</html>");
+            }
         } catch (Exception e) {
             pw.println("<html>");
             pw.println("<h1> Wrong JSON</h1>");

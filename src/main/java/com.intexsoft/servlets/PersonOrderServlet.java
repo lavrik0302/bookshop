@@ -1,7 +1,5 @@
 package com.intexsoft.servlets;
 
-import com.intexsoft.controler.ConnectToDb;
-import com.intexsoft.controler.ConnectionPool;
 import com.intexsoft.controler.dao.*;
 import com.intexsoft.controler.findRequest.*;
 import com.intexsoft.controler.updateRequest.UpdatePersonOrderRequest;
@@ -17,7 +15,6 @@ import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
@@ -102,48 +99,64 @@ public class PersonOrderServlet extends HttpServlet {
             JsonDeserializer jsonDeserializer = new JsonDeserializer(sb.toString());
             CreatePersonOrderDTO createPersonOrderDTO = mapper.map(jsonDeserializer.parseValue(), CreatePersonOrderDTO.class);
             UUID uuid = UUID.randomUUID();
-            PersonOrder personOrder = new PersonOrder();
-            personOrder.setOrderId(uuid);
-            personOrder.setPersonId(UUID.fromString(createPersonOrderDTO.getPersonId()));
-            personOrder.setAdress(createPersonOrderDTO.getAdress());
-            personOrder.setStatusId(createPersonOrderDTO.getStatusId());
-            personOrderDAO.createPersonOrder(personOrder);
-            Cart cart = cartDAO.findWithBooks(new FindCartRequest().setCartPersonId(personOrder.getPersonId()));
-            List<CartHasBook> listOfBooks = cartHasBookDAO.find(new FindCartHasBookRequest().setCartId(cart.getCartId()));
-            for (CartHasBook cartHasBook : listOfBooks) {
-                personOrderHasBookDAO.createRow(uuid, cartHasBook.getBookId(), cartHasBook.getBookCount());
-                cartHasBookDAO.delete(new FindCartHasBookRequest().setCartId(cart.getCartId()).setBookId(cartHasBook.getBookId()));
-                Book book = bookDAO.find(new FindBookRequest().setBookId(cartHasBook.getBookId())).get(0);
-                book.setCountInStock(book.getCountInStock() - cartHasBook.getBookCount());
-                bookDAO.updateBook(book);
+            Cart finding = cartDAO.find(new FindCartRequest().setCartPersonId(UUID.fromString(createPersonOrderDTO.getPersonId())));
+
+            List<CartHasBook> check = cartHasBookDAO.find(new FindCartHasBookRequest().setCartId(finding.getCartId()));
+            boolean availableStatus = true;
+            for (CartHasBook cartHasBook : check) {
+                if (cartHasBook.getBookCount() > bookDAO.find(new FindBookRequest().setBookId(cartHasBook.getBookId())).get(0).getCountInStock()) {
+                    availableStatus = false;
+                }
             }
-            PersonOrderDTO personOrderDTO = new PersonOrderDTO();
-            pw.println("<html>");
-            pw.println("<h1> orderId = " + personOrder.getOrderId() + "</h1>");
-            personOrderDTO.setOrderId(personOrder.getOrderId().toString());
-            pw.println("<h1> personId = " + personOrder.getPersonId() + "</h1>");
-            personOrderDTO.setPersonId(personOrder.getPersonId().toString());
-            pw.println("<h1> adress = " + personOrder.getAdress() + "</h1>");
-            personOrderDTO.setAdress(personOrder.getAdress());
-            pw.println("<h1> status = " + personOrder.getStringStatusId() + "</h1>");
-            personOrderDTO.setStatusId(personOrder.getStatusId());
-            pw.println("<h1> books </h1>");
-            PersonOrderHasBookDTO[] bookArr = new PersonOrderHasBookDTO[listOfBooks.size()];
-            int bookCounter = 0;
-            for (CartHasBook book : listOfBooks) {
-                PersonOrderHasBookDTO temp = new PersonOrderHasBookDTO();
-                temp.setOrderId(personOrder.getOrderId().toString());
-                pw.println("<h1> bookId = " + book.getBookId() + "</h1>");
-                temp.setBookId(book.getBookId().toString());
-                pw.println("<h1> bookCount = " + book.getBookCount() + "</h1>");
-                temp.setBookCount(book.getBookCount());
-                bookArr[bookCounter] = temp;
-                bookCounter++;
-                pw.println("<h1>---------------------------</h1>");
+            if (availableStatus) {
+                PersonOrder personOrder = new PersonOrder();
+                personOrder.setOrderId(uuid);
+                personOrder.setPersonId(UUID.fromString(createPersonOrderDTO.getPersonId()));
+                personOrder.setAdress(createPersonOrderDTO.getAdress());
+                personOrder.setStatusId(createPersonOrderDTO.getStatusId());
+                personOrderDAO.createPersonOrder(personOrder);
+                Cart cart = cartDAO.findWithBooks(new FindCartRequest().setCartPersonId(personOrder.getPersonId()));
+                List<CartHasBook> listOfBooks = cartHasBookDAO.find(new FindCartHasBookRequest().setCartId(cart.getCartId()));
+                for (CartHasBook cartHasBook : listOfBooks) {
+                    personOrderHasBookDAO.createRow(uuid, cartHasBook.getBookId(), cartHasBook.getBookCount());
+                    cartHasBookDAO.delete(new FindCartHasBookRequest().setCartId(cart.getCartId()).setBookId(cartHasBook.getBookId()));
+                    Book book = bookDAO.find(new FindBookRequest().setBookId(cartHasBook.getBookId())).get(0);
+                    book.setCountInStock(book.getCountInStock() - cartHasBook.getBookCount());
+                    bookDAO.updateBook(book);
+                }
+                PersonOrderDTO personOrderDTO = new PersonOrderDTO();
+                pw.println("<html>");
+                pw.println("<h1> orderId = " + personOrder.getOrderId() + "</h1>");
+                personOrderDTO.setOrderId(personOrder.getOrderId().toString());
+                pw.println("<h1> personId = " + personOrder.getPersonId() + "</h1>");
+                personOrderDTO.setPersonId(personOrder.getPersonId().toString());
+                pw.println("<h1> adress = " + personOrder.getAdress() + "</h1>");
+                personOrderDTO.setAdress(personOrder.getAdress());
+                pw.println("<h1> status = " + personOrder.getStringStatusId() + "</h1>");
+                personOrderDTO.setStatusId(personOrder.getStatusId());
+                pw.println("<h1> books </h1>");
+                PersonOrderHasBookDTO[] bookArr = new PersonOrderHasBookDTO[listOfBooks.size()];
+                int bookCounter = 0;
+                for (CartHasBook book : listOfBooks) {
+                    PersonOrderHasBookDTO temp = new PersonOrderHasBookDTO();
+                    temp.setOrderId(personOrder.getOrderId().toString());
+                    pw.println("<h1> bookId = " + book.getBookId() + "</h1>");
+                    temp.setBookId(book.getBookId().toString());
+                    pw.println("<h1> bookCount = " + book.getBookCount() + "</h1>");
+                    temp.setBookCount(book.getBookCount());
+                    bookArr[bookCounter] = temp;
+                    bookCounter++;
+                    pw.println("<h1>---------------------------</h1>");
+                }
+                personOrderDTO.setBooks(bookArr);
+                pw.println("<h1> As JSON = " + jsonSerializer.serialize(personOrderDTO) + "</h1>");
+                pw.println("</html>");
+            } else {
+                pw.println("<html>");
+                pw.println("<h1> Can't crete new order. Please wait until we add books to stock</h1>");
+                response.setStatus(412);
+                pw.println("</html>");
             }
-            personOrderDTO.setBooks(bookArr);
-            pw.println("<h1> As JSON = " + jsonSerializer.serialize(personOrderDTO) + "</h1>");
-            pw.println("</html>");
         } catch (Exception e) {
             pw.println("<html>");
             pw.println("<h1> Wrong JSON</h1>");
